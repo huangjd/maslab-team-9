@@ -2,7 +2,7 @@
 Copyright (C) 2015-2016 - 2016 MIT Mobile Autonomous Systems Lab (6.146) Team 9
   William Junda Huang '16 <huangjd@mit.edu>
   Mengyuan Sun '19 <mysun@mit.edu>
-  Alan D. Cheng '19 <adcheng@mit.edu>
+  Alan De-Hao Cheng '19 <adcheng@mit.edu>
   Tugsbayasgalan Manlaibaatar '19 <tugsuu@mit.edu>
   Kristina Elizabeth Schmidt '17 <schmidtk@mit.edu>
 

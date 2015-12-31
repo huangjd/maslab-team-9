@@ -265,6 +265,11 @@ private:
 
     /* Our first guesstimate is the root node */
     InternalNodeType *result = root;
+
+    if (!root) {
+      return rset;
+    }
+
     double dist_sq = 0;
     for (int i = 0; i < Dimension; i++) {
       dist_sq += sqr(result->pos[i] - pos[i]);
@@ -276,7 +281,7 @@ private:
 
     /* Store the result */
     if (result) {
-      rset.insert(result, -1.0);
+      rset.insert(result, dist_sq);
     }
     return rset;
   }
@@ -304,8 +309,13 @@ private:
    */
   template <class Container>
   NNQueryResults nearest_range_impl(const Container& pos, double range) const {
-    assert(Dimension = pos.size());
-    NNQueryResults rset(this);
+    assert(Dimension == pos.size());
+    NNQueryResults rset;
+
+    if (!root) {
+      return rset;
+    }
+
     root->find_nearest(pos, range, &rset);
     std::sort(rset.begin(), rset.end(), [](const typename NNQueryResults::value_type &a, const typename NNQueryResults::value_type &b)->bool {
       return a.second < b.second;
