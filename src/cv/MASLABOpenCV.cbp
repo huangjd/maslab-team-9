@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="MASLABOpenCV" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/MASLABOpenCV" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+					<Add directory="C:/opencv/mingwbuild/install/include" />
+				</Compiler>
+				<Linker>
+					<Add library="C:\opencv\mingwbuild\install\x64\mingw\lib\libopencv_calib3d2411.dll.a" />
+					<Add library="C:\opencv\mingwbuild\install\x64\mingw\lib\libopencv_contrib2411.dll.a" />
+					<Add library="C:\opencv\mingwbuild\install\x64\mingw\lib\libopencv_core2411.dll.a" />
+					<Add library="C:\opencv\mingwbuild\install\x64\mingw\lib\libopencv_features2d2411.dll.a" />
+					<Add library="C:\opencv\mingwbuild\install\x64\mingw\lib\libopencv_flann2411.dll.a" />
+					<Add library="C:\opencv\mingwbuild\install\x64\mingw\lib\libopencv_gpu2411.dll.a" />
+					<Add library="C:\opencv\mingwbuild\install\x64\mingw\lib\libopencv_highgui2411.dll.a" />
+					<Add library="C:\opencv\mingwbuild\install\x64\mingw\lib\libopencv_imgproc2411.dll.a" />
+					<Add library="C:\opencv\mingwbuild\install\x64\mingw\lib\libopencv_legacy2411.dll.a" />
+					<Add library="C:\opencv\mingwbuild\install\x64\mingw\lib\libopencv_ml2411.dll.a" />
+					<Add library="C:\opencv\mingwbuild\install\x64\mingw\lib\libopencv_nonfree2411.dll.a" />
+					<Add library="C:\opencv\mingwbuild\install\x64\mingw\lib\libopencv_objdetect2411.dll.a" />
+					<Add library="C:\opencv\mingwbuild\install\x64\mingw\lib\libopencv_ocl2411.dll.a" />
+					<Add library="C:\opencv\mingwbuild\install\x64\mingw\lib\libopencv_photo2411.dll.a" />
+					<Add library="C:\opencv\mingwbuild\install\x64\mingw\lib\libopencv_stitching2411.dll.a" />
+					<Add library="C:\opencv\mingwbuild\install\x64\mingw\lib\libopencv_superres2411.dll.a" />
+					<Add library="C:\opencv\mingwbuild\install\x64\mingw\lib\libopencv_ts2411.a" />
+					<Add library="C:\opencv\mingwbuild\install\x64\mingw\lib\libopencv_video2411.dll.a" />
+					<Add library="C:\opencv\mingwbuild\install\x64\mingw\lib\libopencv_videostab2411.dll.a" />
+					<Add directory="C:/opencv/mingwbuild/install/x64/mingw/lib" />
+				</Linker>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/MASLABOpenCV" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+			<Add option="-fexceptions" />
+		</Compiler>
+		<Linker>
+			<Add directory="C:/opencv/mingwbuild/install/include" />
+		</Linker>
+		<Unit filename="CVTest.cpp" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
