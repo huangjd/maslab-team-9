@@ -4,9 +4,6 @@ project(test)
 set(BUILD_TESTS TRUE)
 set(BUILD_APPS TRUE)
 
-set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/CMakeModules/")
-message("CMake Modules Path is ${CMAKE_MODULE_PATH}")
-
 macro(using name found dir lib)
   find_package(${name})
   if(NOT ${found})
@@ -39,10 +36,9 @@ macro(expect_packages appname)
 endmacro(expect_packages)
 
 file(GLOB header "*.h")
-file(GLOB src "*.cpp" "*.c" ".asm")
+file(GLOB src "*.cpp" "*.c" ".S")
 add_library(maslab SHARED ${src} ${header})
 set_target_properties(maslab PROPERTIES LINKER_LANGUAGE CXX)
-#add_library(maslab_static STATIC ${src} ${header})
 
 if(${BUILD_TESTS})
   expect_packages(tests GTest)
