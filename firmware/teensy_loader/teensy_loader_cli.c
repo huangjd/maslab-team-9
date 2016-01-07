@@ -86,6 +86,10 @@ const char *filename=NULL;
 
 int main(int argc, char **argv) { // Hack - William Huang
   if (argc > 1) {
+    if (access(argv[1], F_OK) == -1) {
+      perror("");
+      return -1;
+    }
     const char* argv2[4] = {"teensy_loader", "-mmcu=mk20dx256", "-w", argv[1]};
     return _main(4, argv2);
   } else {
@@ -93,6 +97,10 @@ int main(int argc, char **argv) { // Hack - William Huang
     const char *rel = "/../firmware/src/main.hex";
     c = realloc(c, strlen(c) + strlen(rel) + 1);
     strcpy(c + strlen(c), rel);
+    if (access(c, F_OK) == -1) {
+      perror("");
+      return -1;
+    }
     const char* argv2[4] = {"teensy_loader", "-mmcu=mk20dx256", "-w", c};
     return _main(4, argv2);
   }
