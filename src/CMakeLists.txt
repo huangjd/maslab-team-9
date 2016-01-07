@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 2.8)
 project(test)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 
 set(BUILD_TESTS TRUE)
 set(BUILD_APPS TRUE)
@@ -39,6 +40,7 @@ file(GLOB header "*.h")
 file(GLOB src "*.cpp" "*.c" ".S")
 add_library(maslab SHARED ${src} ${header})
 set_target_properties(maslab PROPERTIES LINKER_LANGUAGE CXX)
+#add_library(maslab_static STATIC ${src} ${header})
 
 if(${BUILD_TESTS})
   expect_packages(tests GTest)

@@ -84,7 +84,21 @@ const char *filename=NULL;
 /*                                                              */
 /****************************************************************/
 
-int main(int argc, char **argv)
+int main(int argc, char **argv) { // Hack - William Huang
+  if (argc > 1) {
+    const char* argv2[4] = {"teensy_loader", "-mmcu=mk20dx256", "-w", argv[1]};
+    return _main(4, argv2);
+  } else {
+    char *c = get_current_dir_name();
+    const char *rel = "/../firmware/src/main.hex";
+    c = realloc(c, strlen(c) + strlen(rel) + 1);
+    strcpy(c + strlen(c), rel);
+    const char* argv2[4] = {"teensy_loader", "-mmcu=mk20dx256", "-w", c};
+    return _main(4, argv2);
+  }
+}
+
+int _main(int argc, char **argv)
 {
 	unsigned char buf[2048];
 	int num, addr, r, write_size=block_size+2;
