@@ -65,3 +65,9 @@
 1384335862 c:\opencv\mingwbuild\install\include\opencv2\imgproc\types_c.h
 	"opencv2/core/core_c.h"
 
+1452214445 source:c:\users\alan\maslab-team-9\src\cv\cvtest.cpp
+	<iostream>
+	<vector>
+	"opencv2/highgui/highgui.hpp"
+	"opencv2/imgproc/imgproc.hpp"
+
