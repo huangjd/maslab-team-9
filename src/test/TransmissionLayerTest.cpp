@@ -11,8 +11,6 @@
 
 #include "../../firmware/src/ProtocolConstants.h"
 
-using namespace std;
-
 static uint32_t delayCounter = 0;
 void delay(uint32_t ms) {
  delayCounter += ms;
@@ -22,8 +20,8 @@ extern uint8_t recvBuf[RX_BUF_SIZE];
 extern size_t recvBufIndex;
 
 class HackSerial {
-  vector<uint8_t> input;
-  vector<uint8_t> output;
+  std::vector<uint8_t> input;
+  std::vector<uint8_t> output;
   size_t index = 0;
 
 public:
@@ -34,7 +32,7 @@ public:
     recvBufIndex = 0;
   }
 
-  const vector<uint8_t>& getOutput() const {
+  const std::vector<uint8_t>& getOutput() const {
     return output;
   }
 
@@ -52,10 +50,24 @@ public:
     output.push_back((uint8_t)n);
   }
 
+  void send_now() {
+
+  }
+
 } Serial;
 
 #define __HACK_TRANSMISSION_LAYER_TEST_CPP__
 #include "../../firmware/src/TransmissionLayer.cpp"
+
+void release() {}
+void drop() {}
+void endgame() {}
+void powerdown() {}
+void terminate() {}
+void halt() {}
+void cpuid() {}
+
+using namespace std;
 
 template<class T>
 static void assertVectorEqual(const vector<T>& expected, const vector<T>& actual) {
@@ -103,21 +115,21 @@ void timedRun(void(*func)(), bool expectedReturn = false, int seconds = 1) {
   setrlimit(RLIMIT_CPU, &old_limit);
 }
 
-void TrivialCtrlCharTest(ControlCharacters c) {
+void TrivialCtrlCharTest(Characters c) {
   Serial.reset({c});
   timedRun(getCommandBlocked);
   assertVectorEqual({}, Serial.getOutput());
   assertRecvBuffer({});
 }
 
-void InvalidAfterCmdCtrlCharTest(ControlCharacters c) {
+void InvalidAfterCmdCtrlCharTest(Characters c) {
   Serial.reset({CMD, c});
   timedRun(getCommandBlocked);
   assertVectorEqual({INVAL}, Serial.getOutput());
   assertRecvBuffer({});
 }
 
-void InvalidCtrlCharTest(ControlCharacters c) {
+void InvalidCtrlCharTest(Characters c) {
   Serial.reset({c});
   timedRun(getCommandBlocked);
   assertVectorEqual({INVAL}, Serial.getOutput());

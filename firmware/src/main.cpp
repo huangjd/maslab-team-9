@@ -5,6 +5,7 @@
 #include "Config.h"
 #include "Common.h"
 #include "TransmissionLayer.h"
+#include "ApplicationLayer.h"
 
 void setup() {
   analogReadResolution(ADC_RESOLUTION);
@@ -20,7 +21,14 @@ void setup() {
 
 void loop() {
   getCommandBlocked();
-  // processCommand();
+  if (parseCommand()) {
+    ackCommand();
+  }
+}
+
+void cpuid() {
+  uint32_t i = 0x411FC271;
+  Serial.write((uint8_t*)&i, 4);
 }
 
 int main() {

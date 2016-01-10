@@ -1,11 +1,15 @@
 #include "TransmissionLayer.h"
+#include "Terminate.h"
 
 #ifndef __HACK_TRANSMISSION_LAYER_TEST_CPP__
 #include "WProgram.h"
 #endif
 
 u8 recvBuf[RX_BUF_SIZE];
+u8 sendBuf[TX_BUF_SIZE];
 size_t recvBufIndex = 0;
+size_t sendBufIndex = 0;
+
 // int timeout
 
 u8 getRawBlocked() {
@@ -19,6 +23,8 @@ void clearRecvBuf() {
   recvBufIndex = 0;
 }
 
+extern void cpuid();
+
 void getCommandBlocked() {
   int state = 0;
   while (1) {
@@ -28,7 +34,7 @@ void getCommandBlocked() {
       if (state > 3) {
         return;
       } else if (state > 0) {
-        Serial.write(INVAL);
+        sendCharAndFlush(INVAL);
         state = 0;
       }
       break;
@@ -39,7 +45,7 @@ void getCommandBlocked() {
 
     case CMD:
       if (state > 0) {
-        Serial.write(INVAL);
+        sendCharAndFlush(INVAL);
       }
       clearRecvBuf();
       state = 1;
@@ -51,7 +57,7 @@ void getCommandBlocked() {
       break;*/
 
     case ECHO:
-      Serial.write(AECHO);
+      sendCharAndFlush(AECHO);
       break;
 
     case AECHO:
@@ -61,7 +67,7 @@ void getCommandBlocked() {
     case TIMEOUT:
       if (state > 0) {
     case ACK:
-        Serial.write(INVAL);
+        sendCharAndFlush(INVAL);
         state = 0;
       }
       break;
@@ -78,12 +84,12 @@ void getCommandBlocked() {
           }
           break;
         } else if (c != CAN) {
-          Serial.write(INVAL);
+          sendCharAndFlush(INVAL);
         }
         state = 0;
         break;
       } else {
-        Serial.write(INVAL);
+        sendCharAndFlush(INVAL);
         state = 0;
       }
       break;
@@ -102,11 +108,21 @@ void getCommandBlocked() {
 
     case CLR:
       if (state > 0) {
-        Serial.write(INVAL);
+        sendCharAndFlush(INVAL);
         state = 0;
       } else {
         clearRecvBuf();
       }
+      break;
+
+    case TERM:
+      terminate();
+
+    case KILL:
+      halt();
+
+    case CPUID:
+      cpuid();
       break;
 
     default:
@@ -118,7 +134,7 @@ void getCommandBlocked() {
           return;
         }
       } else {
-        Serial.write(INVAL);
+        sendCharAndFlush(INVAL);
         state = 0;
       }
       break;
@@ -126,6 +142,21 @@ void getCommandBlocked() {
   }
 }
 
-void sendPacket(Command* cmd) {
+void sendCharAndFlush(u8 c) {
+  Serial.write(c);
+  Serial.send_now();
+}
 
+void ackCommand() {
+  Serial.write(ACK);
+  for (size_t i = 0; i < sendBufIndex; i++) {
+    if (sendBuf[i] < MAX_TRANSMISSION_CONTROL) {
+      Serial.write(ESC);
+      Serial.write(sendBuf[i] + ESCAPE_OFF);
+    } else {
+      Serial.write(sendBuf[i]);
+    }
+  }
+  Serial.send_now();
+  sendBufIndex = 0;
 }
