@@ -1,0 +1,29 @@
+#ifndef __PROTOCOL_CONSTANTS_H__
+#define __PROTOCOL_CONSTANTS_H__
+
+#define RX_BUF_SIZE 520
+#define TX_BUF_SIZE 521
+
+enum ControlCharacters {
+  TRANSMISSION_CONTROL = 0,
+  NUL = TRANSMISSION_CONTROL,
+  CAN,
+  CMD,
+  ACK,
+  ECHO,
+  AECHO,
+  INVAL,
+  TIMEOUT,
+  ESC,
+  ECHOBUF,
+  DELAY1,
+  MAX_TRANSMISSION_CONTROL,
+  CLR,
+
+  COMMAND = 32,
+  REPR = COMMAND,
+
+  ESCAPE_OFF = 128
+};
+
+#endif // __PROTOCOL_CONSTANTS_H__

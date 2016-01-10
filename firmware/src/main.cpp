@@ -4,37 +4,23 @@
 
 #include "Config.h"
 #include "Common.h"
-#include "CommandDispatcher.h"
-
-CommandDispatcher dispatcher;
+#include "TransmissionLayer.h"
 
 void setup() {
-  yield();
   analogReadResolution(ADC_RESOLUTION);
   analogWriteResolution(PWM_RESOLUTION);
   analogWriteFrequency(FTM0PIN, PWM0_FREQUENCY);
   analogWriteFrequency(FTM1PIN, PWM1_FREQUENCY);
   analogWriteFrequency(FTM2PIN, PWM2_FREQUENCY);
+
+  Serial.flush();
+  while (Serial.read() != -1) { // Clear serial buffer
+  }
 }
 
 void loop() {
-  u8 seqnum = blockingSerialRead();
-  switch (seqnum & SENDER_MASK) {
-  case MASTER_SEND: {
-    CommandType command = (CommandType) blockingSerialRead();
-    dispatcher.process(seqnum & SEQNUM_MASK, command);
-  }
-    return;
-  case MASTER_ACK:
-    // ToDo: Process ack;
-
-    return;
-  case SLAVE_SEND:
-    // Drop
-  case SLAVE_ACK:
-    // Drop
-    ;
-  }
+  getCommandBlocked();
+  // processCommand();
 }
 
 int main() {

@@ -49,7 +49,7 @@ if(${BUILD_TESTS})
     get_filename_component(name ${test} NAME_WE)
     add_executable(${name} ${test})
     target_link_libraries(${name} maslab ${LIB_TO_LINK})
-    add_custom_command(TARGET ${name} POST_BUILD COMMAND "${CMAKE_BINARY_DIR}/bin/${name}")
+    #add_custom_command(TARGET ${name} POST_BUILD COMMAND "${CMAKE_BINARY_DIR}/bin/${name}")
   endforeach(test)
 endif(${BUILD_TESTS})
 
