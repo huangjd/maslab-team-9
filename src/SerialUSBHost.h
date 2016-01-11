@@ -10,10 +10,18 @@ class SerialUSBHost {
 
   char defaultDevice[13];
 
-  static constexpr size_t OUTPUT_BUFFER_MTU = 520;
+  static constexpr size_t SEND_BUFFER_MTU = 520;
+  static constexpr size_t RECV_BUFFER_MTU = 521;
   static constexpr size_t APPLICATION_MTU = 259;
 
-  uint8_t outputBuf[OUTPUT_BUFFER_MTU];
+  uint8_t sendBuf[SEND_BUFFER_MTU];
+
+  uint8_t recvBuf[RECV_BUFFER_MTU];
+  size_t  recvBufPtrLower, recvBufPtrUpper;
+
+  bool escaped;
+
+  int fetchRecvBuf();
 
 public:
   SerialUSBHost();
@@ -26,8 +34,8 @@ public:
   int sendCmd(size_t n, const char buf[]);
 
   int recvRaw(uint8_t *c);
-
-//  int recv(std::vector<uint8_t> &buf);
+  int recvEscaped(uint8_t *c);
+  int recvResponse(uint8_t *cmdtype, std::vector<uint8_t> &buf);
 };
 
 #endif // __SERIAL_USB_HOST_H__

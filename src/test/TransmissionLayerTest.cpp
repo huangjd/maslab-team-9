@@ -194,9 +194,9 @@ TEST(TransmissionLayerTest, ESC) {
 TEST(TransmissionLayerTest, ECHOBUF) {
   Serial.reset({ECHOBUF, CMD, 50, ECHOBUF, REPR, ESC, ESCAPE_OFF + 1, 'a', ECHOBUF});
   timedRun(getCommandBlocked, true);
-  assertVectorEqual({0, 0, 1, 0, 50}, Serial.getOutput());
+  assertVectorEqual({AECHOBUF, 0, 0, AECHOBUF, 1, 0, 50}, Serial.getOutput());
   timedRun(getCommandBlocked);
-  assertVectorEqual({0, 0, 1, 0, 50, 4, 0, 50, REPR, 1, 'a'}, Serial.getOutput());
+  assertVectorEqual({AECHOBUF, 0, 0, AECHOBUF, 1, 0, 50, AECHOBUF, 4, 0, 50, REPR, 1, 'a'}, Serial.getOutput());
 }
 
 TEST(TransmissionLayerTest, DELAY1)  {

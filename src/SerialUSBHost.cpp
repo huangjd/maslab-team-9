@@ -43,7 +43,7 @@ static int tryOpen(const char* deviceName) {
   tty.c_oflag = 0;                // no remapping, no delays
 
   tty.c_cc[VMIN]  = 0;            // read doesn't block
-  tty.c_cc[VTIME] = 1;            // 0.1 seconds read timeout
+  tty.c_cc[VTIME] = 0;            // 0 seconds read timeout
 
   if (tcsetattr (fd, TCSANOW, &tty) != 0) {
     return -1;
@@ -54,7 +54,8 @@ static int tryOpen(const char* deviceName) {
   return fd;
 }
 
-SerialUSBHost::SerialUSBHost() : device_fd(-1), defaultDevice{"/dev/ttyACM0"} {
+SerialUSBHost::SerialUSBHost() : device_fd(-1), defaultDevice{"/dev/ttyACM0"},
+  recvBufPtrLower(0), recvBufPtrUpper(0), escaped(false) {
   device_fd = tryOpen(defaultDevice);
   if (device_fd < 0) {
     for (char c = '1'; c <= '9'; c++) {
@@ -91,17 +92,17 @@ int SerialUSBHost::sendCmd(const std::vector<uint8_t> &buf) {
     return -1;
   }
 
-  outputBuf[0] = CMD;
+  sendBuf[0] = CMD;
   size_t n = 1;
   for (uint8_t c : buf) {
     if ((Characters) c < MAX_TRANSMISSION_CONTROL) {
-      outputBuf[n++] = ESC;
-      outputBuf[n++] = c + ESCAPE_OFF;
+      sendBuf[n++] = ESC;
+      sendBuf[n++] = c + ESCAPE_OFF;
     } else {
-      outputBuf[n++] = c;
+      sendBuf[n++] = c;
     }
   }
-  return write(device_fd, outputBuf, n);
+  return write(device_fd, sendBuf, n);
 }
 
 int SerialUSBHost::sendCmd(size_t n, const char buf[]) {
@@ -113,22 +114,90 @@ int SerialUSBHost::sendCmd(size_t n, const char buf[]) {
     return -1;
   }
 
-  outputBuf[0] = CMD;
+  sendBuf[0] = CMD;
   size_t count = 1;
   for (int i = 0; i < n; i++) {
     if ((Characters) buf[i] < MAX_TRANSMISSION_CONTROL) {
-      outputBuf[count++] = ESC;
-      outputBuf[count++] = buf[i] + ESCAPE_OFF;
+      sendBuf[count++] = ESC;
+      sendBuf[count++] = buf[i] + ESCAPE_OFF;
     } else {
-      outputBuf[count++] = buf[i];
+      sendBuf[count++] = buf[i];
     }
   }
-  return write(device_fd, outputBuf, count);
+  return write(device_fd, sendBuf, count);
+}
+
+int SerialUSBHost::fetchRecvBuf() {
+  recvBufPtrLower = 0;
+  return recvBufPtrUpper = read(device_fd, recvBuf, RECV_BUFFER_MTU);
 }
 
 int SerialUSBHost::recvRaw(uint8_t *c) {
-  return read(device_fd, c, 1);
+  if (recvBufPtrLower < recvBufPtrUpper || fetchRecvBuf()) {
+    *c = recvBuf[recvBufPtrLower++];
+    return 1;
+  } else {
+    return 0;
+  }
 }
+
+int SerialUSBHost::recvEscaped(uint8_t *c) {
+  if (recvRaw(c)) {
+    if (*c == ESC) {
+      if (recvRaw(c)) {
+        *c -= ESCAPE_OFF;
+        return 1;
+      } else {
+        escaped = true;
+        return 0;
+      }
+    } else if (escaped) {
+      escaped = false;
+      *c -= ESCAPE_OFF;
+     }
+    return 1;
+  }
+  return 0;
+}
+
+int SerialUSBHost::recvResponse(uint8_t *cmdtype, std::vector<uint8_t> &buf) {
+  buf.clear();
+  uint8_t c;
+  if (recvRaw(&c)) {
+    switch (c) {
+    case ACK:
+      buf.resize(3);
+      for (int i = 0; i < 3; i++) {
+        if (!recvEscaped(&buf[i])) {
+          return i + 1;
+        }
+      }
+      buf.resize(buf[2] + 3);
+      for (int i = 3; i < (int)buf[2] + 3; i++) {
+        if (!recvEscaped(&buf[i])) {
+          return i + 1;
+        }
+      }
+      return buf.size();
+
+    case STATUS:
+      // TODO: Implement;
+      break;
+
+    case ECHO:
+      // TODO: Implement;
+
+    case AECHO:
+      // TODO: Implement;
+      break;
+    default:
+      return 1;
+    }
+  } else {
+    return 0;
+  }
+}
+
 
 /*int SerialUSBHost::recv(std::vector<uint8_t> &buf) {
   read(device_fd, buf, n);

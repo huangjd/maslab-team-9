@@ -66,6 +66,7 @@ void getCommandBlocked() {
     case INVAL:
     case TIMEOUT:
       if (state > 0) {
+    case STATUS:
     case ACK:
         sendCharAndFlush(INVAL);
         state = 0;
@@ -95,11 +96,15 @@ void getCommandBlocked() {
       break;
 
     case ECHOBUF:
+      Serial.write(AECHOBUF);
       Serial.write((u8)recvBufIndex);
       Serial.write((u8)(recvBufIndex >> 8));
       for (size_t j = 0; j < recvBufIndex; j++) {
         Serial.write(recvBuf[j]);
       }
+      break;
+
+    case AECHOBUF:
       break;
 
     case DELAY1:

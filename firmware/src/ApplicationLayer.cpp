@@ -77,12 +77,14 @@ int parseCommand() {
     if (size == 1) {
       ackNull(seqnum, OK, 1);
       sendBuf[3] = analogRead(recvBuf[3]);
+      return 1;
     }
     break;
 
   case SET_ANALOG:
     if (size == 2) {
       analogWrite(recvBuf[3], recvBuf[4]);
+      return ackNull(seqnum, OK);;
     }
     break;
 
