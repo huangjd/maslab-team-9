@@ -17,4 +17,14 @@ inline u8 blockingSerialRead() {
   return data;
 }
 
+template <typename T>
+void sendBinary(const T& val) {
+  Serial.write((const uint8_t*)(&val), sizeof(T));
+}
+
+template <typename T>
+void recvBinary(T *val) {
+  Serial.readBytes(val, sizeof(T));
+}
+
 #endif // __COMMON_H__

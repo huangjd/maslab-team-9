@@ -12,5 +12,13 @@
 #define FTM1PIN 6
 #define FTM2PIN 25
 
+// IRQ
+#define ISOCHRONOUS_TIMER_PIN 6
+
+
+// IRQL
+#define ISOCHRONOUS_TIMER_IRQL 129
+
+
 #endif // __CONFIG_H__
 

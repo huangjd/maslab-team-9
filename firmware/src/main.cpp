@@ -14,6 +14,7 @@ void setup() {
   analogWriteFrequency(FTM1PIN, PWM1_FREQUENCY);
   analogWriteFrequency(FTM2PIN, PWM2_FREQUENCY);
 
+  Serial.setTimeout(1);
   Serial.flush();
   while (Serial.read() != -1) { // Clear serial buffer
   }
@@ -30,6 +31,7 @@ void cpuid() {
   uint32_t i = 0x411FC271;
   Serial.write((uint8_t*)&i, 4);
 }
+
 
 int main() {
   setup();
