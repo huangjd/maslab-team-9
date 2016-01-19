@@ -71,7 +71,6 @@ struct Map {
 			while (regex_search(info, capture, parser)==true) {
 				int num = atoi(capture.str(iteration).c_str()); 
 				nums.push_back(num);
-				++iteration;
 				info=info.substr(capture.position(iteration)+2);
 			}
 			int num2 = atoi(info.c_str()); 
