@@ -1,10 +1,10 @@
 #include <pthread.h>
 #include <stdio.h>
-#include "PathFinderNew.cpp"
+#include "A*.cpp"
 #include "SerialUSBHost.h"
-#include "ProtocolConstants.h" //this might have to be changed 
+#include "../firmware/src/ProtocolConstants.h" //this might have to be changed 
 #include <iostream>
-#include "map.cpp"
+#include "../doc/map.cpp"
 
 using std::tuple;
 using std::vector;
@@ -131,7 +131,7 @@ std::cout<< "reached multithread" << std::endl;
 				commands->IRDataL=rob.getIRDataL(); 
 				commands->IRDataR=rob.getIRDataR();
 				} 
-			else if (command=="moveU") { rob.moveU(); }
+			else if (command=="moveU") { rob.moveU();}
 			else if (command=="moveL") {rob.moveL(); } 
 			else if (command=="moveR") {rob.moveR();} 
 			else if (command=="change90") {rob.changeDirectionFacing(90);}
@@ -189,8 +189,8 @@ class Brain {
 		
 		}
 		
-		bool move() {
-		
+		bool move(struct *info) {
+			info->com="stop";
 		}
 		
 		bool randomMovement() {
@@ -237,9 +237,6 @@ int main() {
 		for (int m=0; m<30; m++) {
 	  	for (int n=0; n<30; n++) {
 	    	locs[m][n] = make_tuple(m,n);
-	   		if (map.lookForStacks(m,n).getPosX()!=-1) {
-	    		
-	    	} 
 	    	if (map.lookForObstacles(m,n)!='\0' && map.lookForObstacles(m,n)=='W') {
 	    		pm[m][n] = 100;
 	    		std::cout<<"wall= "<<m<<" " <<n<<std::endl;
@@ -271,6 +268,8 @@ int main() {
 	Robot robot(map);
 	bool interrupt;
 	struct info *infos;
+	brain.move();
+	
 	pthread_t brainThread;
 	if(pthread_create(&brainThread, NULL, robotDo , &infos)) {
 		fprintf(stderr, "Error creating thread\n");
