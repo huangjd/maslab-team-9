@@ -11,11 +11,22 @@ int main() {
 
 
   while (true) {
+    char type;
     int pin;
     int level;
-    cin >> pin >> level;
-    level = (bool)level;
-    host.sendCmd({0, SET_PINMODE, 2, pin, 1});
-    host.sendCmd({0, SET_DIGITAL, 2, pin, level});
+    cin >> type >> pin >> level;
+
+    uint8_t lev = level;
+
+    switch (type) {
+    case 'A':
+      host.sendCmd({0, SET_ANALOG, 2, pin, level});
+      break;
+    case 'D':
+      host.sendCmd({0, SET_DIGITAL, 2, pin, (bool)level});
+      break;
+    case 'S':
+      host.sendCmd({0, SET_PINMODE, 2, pin, level});
+    }
   }
 }

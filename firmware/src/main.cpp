@@ -8,6 +8,19 @@
 #include "ApplicationLayer.h"
 
 void setup() {
+  pinMode(13, OUTPUT);
+  digitalWrite(13, 1);
+  delay(500);
+  digitalWrite(13, 0);
+  pinMode(13, INPUT);
+
+  pinMode(28, OUTPUT);
+  for (int i = 0; i < 256; i++) {
+    analogWrite(28, i);
+    delay(10);
+  }
+  pinMode(28, INPUT);
+
   analogReadResolution(ADC_RESOLUTION);
   analogWriteResolution(PWM_RESOLUTION);
   analogWriteFrequency(FTM0PIN, PWM0_FREQUENCY);
