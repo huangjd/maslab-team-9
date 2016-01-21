@@ -2,13 +2,15 @@
 #include <fstream>
 #include <vector>
 #include <string>
+#include <math.h>
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
 
 using namespace cv;
 using namespace std;
 
-void GenXYRPos(vector<int> xPos, vector<int> yPos, vector<int> rRot);
+void GenXYRPos();
+vector<double> xP, yP, rR;
 
 ///Main Function
 int main( int argc, char** argv )
@@ -130,8 +132,53 @@ int main( int argc, char** argv )
                         << Stacks[i][2] << ", "  << Stacks[i][3] << ", " << Stacks[i][4] << endl;
     }
 
-    resize(Grid, GridLg, GridLg.size(), 0, 0, INTER_NEAREST);
-    imshow("Grid Large", GridLg);
-    waitKey();
+    GenXYRPos();
+    int x0, x1, x2, y0, y1, y2;
+    int tempx, tempy;
+    double a;
 
+    for(int i = 0; i < xP.size(); i++)
+    {
+        a = rR[i] * (M_PI/180);
+
+        x0 = xP[i]*40; y0 = yP[i]*40;
+        x1 = xP[i]*40; y1 = yP[i]*40 + 5;
+        x2 = xP[i]*40; y2 = yP[i]*40 - 5;
+
+        cout << x1 << ", " << y1 << ":" << x2 << ", " << y2 << endl;
+
+        tempx = ((x1 - x0) * cos(a)) - ((y1 - y0) * sin(a)) + x0;
+        tempy = ((x1 - x0) * sin(a)) + ((y1 - y0) * cos(a)) + y0;
+        x1 = tempx; y1 = tempy;
+
+        tempx = ((x2 - x0) * cos(a)) - ((y2 - y0) * sin(a)) + x0;
+        tempy = ((x2 - x0) * sin(a)) + ((y2 - y0) * cos(a)) + y0;
+        x2 = tempx; y2 = tempy;
+
+        resize(Grid, GridLg, GridLg.size(), 0, 0, INTER_NEAREST);
+        arrowedLine(GridLg, Point(x1, y1), Point(x2, y2), Scalar(255, 255, 0), 1);
+        imshow("Grid Large", GridLg);
+        waitKey();
+
+    }
+}
+
+void GenXYRPos()
+{
+    xP.push_back(5); yP.push_back(5); rR.push_back(0);
+    xP.push_back(5); yP.push_back(5); rR.push_back(5);
+    xP.push_back(5); yP.push_back(5); rR.push_back(10);
+    xP.push_back(5); yP.push_back(5); rR.push_back(15);
+    xP.push_back(5); yP.push_back(5); rR.push_back(20);
+    xP.push_back(5); yP.push_back(5); rR.push_back(25);
+    xP.push_back(5); yP.push_back(5); rR.push_back(30);
+    xP.push_back(5); yP.push_back(5); rR.push_back(35);
+    xP.push_back(5); yP.push_back(5); rR.push_back(40);
+    xP.push_back(5); yP.push_back(5); rR.push_back(45);
+
+    xP.push_back(5.2); yP.push_back(4.8); rR.push_back(45);
+    xP.push_back(5.4); yP.push_back(4.6); rR.push_back(45);
+    xP.push_back(5.6); yP.push_back(4.4); rR.push_back(45);
+    xP.push_back(5.8); yP.push_back(4.2); rR.push_back(45);
+    xP.push_back(6.0); yP.push_back(4.0); rR.push_back(45);
 }

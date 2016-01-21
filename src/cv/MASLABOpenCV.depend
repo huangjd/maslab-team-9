@@ -71,3 +71,12 @@
 	"opencv2/highgui/highgui.hpp"
 	"opencv2/imgproc/imgproc.hpp"
 
+1453412650 source:c:\users\alan\maslab-team-9\src\cv\drawrobot.cpp
+	<iostream>
+	<fstream>
+	<vector>
+	<string>
+	<math.h>
+	"opencv2/highgui/highgui.hpp"
+	"opencv2/imgproc/imgproc.hpp"
+
