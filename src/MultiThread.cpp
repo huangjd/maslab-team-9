@@ -4,7 +4,7 @@
 #include "SerialUSBHost.h"
 #include "ProtocolConstants.h" //these might have to be changed 
 #include <iostream>
-#include "MapMaker.cpp"
+#include "FileMapMaker.cpp"
 
 using std::tuple;
 using std::vector;
