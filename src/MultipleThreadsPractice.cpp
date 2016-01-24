@@ -32,7 +32,7 @@ private:
 public:
 	Robot(void) {};
 	Robot(Map fake): mapForTesting(fake) {
-	std::tie(xlocation, ylocation)= mapForTesting.getStart();
+		std::tie(xlocation, ylocation)= mapForTesting.getStart();
 	};
 	
 	void moveU () {
@@ -48,7 +48,7 @@ public:
 	}
 	
 	//stack is supposed to be 5x5 on 100x100 grid
-	char lookAtCamera(string str) {
+	char lookWithCamera(string str) {
 		int x=xlocation+0.5;
 		int y=ylocation+0.5;
 		if (str=="top") {char color=mapForTesting.lookForStacks(x, y).getTopBlock();}
@@ -68,6 +68,7 @@ public:
 	//currently makes all walls 5x5 in the 100x100 grid
 	//returns a vector of distance in the 100x100 grid and obstacle prob
 	vector<tuple<int, int>> getIRDataU() {
+		std::cout<<"U IR Data\n";
 		vector<tuple<int,int>> IRDataU;
 		tuple<int, int> data;
 		int i=1;
@@ -79,12 +80,16 @@ public:
 			IRDataU.push_back(data);
 			++i;
 		}
-		data=std::make_tuple(i, 1);
-		IRDataU.push_back(data);
+		y=(int)(ylocation+(i/10));
+		if (mapForTesting.lookForObstacles(xlocation, y)!=' ') {
+			data=std::make_tuple(i, 1);
+			IRDataU.push_back(data);
+		} 
 		return IRDataU;
 	}
 	
 	vector<tuple<int, int>> getIRDataL() {
+		std::cout<<"L IR Data\n";
 		vector<tuple<int,int>> IRDataL;
 		tuple<int, int> data;
 		int i=1;
@@ -96,12 +101,16 @@ public:
 			IRDataL.push_back(data);
 			++i;
 		}
-		data=std::make_tuple(i, 1);
-		IRDataL.push_back(data);
+		x=(int)(ylocation-(i/10));
+		if (mapForTesting.lookForObstacles(x, ylocation)!=' ') {
+			data=std::make_tuple(i, 1);
+			IRDataL.push_back(data);
+		}
 		return IRDataL;
 	}
 	
 	vector<tuple<int, int>> getIRDataR() {
+		std::cout<<"R IR Data\n";
 		vector<tuple<int,int>> IRDataR;
 		tuple<int, int> data;
 		int i=1;
@@ -113,8 +122,11 @@ public:
 			IRDataR.push_back(data);
 			++i;
 		}
-		data=std::make_tuple(i, 1);
-		IRDataR.push_back(data);
+		x=(int)(ylocation+(i/10));
+		if (mapForTesting.lookForObstacles(x, ylocation)!=' ') {
+			data=std::make_tuple(i, 1);
+			IRDataR.push_back(data);
+		}
 		return IRDataR;
 	}
 	
@@ -144,27 +156,17 @@ struct info {
 };
 
 void *robotDo(void *com) {
-std::cout<< "reached multithread" << std::endl;
-		struct info *commands= (struct info*)com;
-		string command=commands->com;
-		std::cout<<"command= "<<command<<" \t";
+	std::cout<< "reached multithread" << std::endl;
+	struct info *commands= (struct info*)com;
+	string command=commands->com;
+	while (command!="stop") {
 		Robot rob=commands->robot;
-			if (command=="sense")  {
-				commands->IRDataU=rob.getIRDataU(); 
-				commands->IRDataL=rob.getIRDataL(); 
-				commands->IRDataR=rob.getIRDataR();
-				std::cout<<"sensing"<<std::endl;
-				} 
-			else if (command=="moveU") { rob.moveU(); std::cout<<"moveU"<<std::endl;}
-			else if (command=="moveL") {rob.moveL(); std::cout<<"moveL"<<std::endl;} 
-			else if (command=="moveR") {rob.moveR();std::cout<<"moveR"<<std::endl;} 
-			else if (command=="change90") {rob.changeDirectionFacing(90);std::cout<<"90"<<std::endl;}
-			else if (command=="change270") {rob.changeDirectionFacing(270);std::cout<<"270"<<std::endl;}
-			else if (command=="change180") {rob.changeDirectionFacing(180);std::cout<<"180"<<std::endl;}
-			else if (command=="stop") {std::cout<<"stop"<<std::endl; } //change
-			else { return 0;std::cout<<"stop"<<std::endl;}	
-		std::cout<<"\n";
-		return NULL;
+		commands->IRDataU=rob.getIRDataU(); 
+		commands->IRDataL=rob.getIRDataL(); 
+		commands->IRDataR=rob.getIRDataR();
+	}
+	std::cout<<"ending"<<std::endl;
+	return NULL;
 		
 }
 
@@ -287,22 +289,76 @@ class Brain {
 			//do later
 		}
 		
-		void getInfoFromIR(info &infop) {
-			infop.makeDo("sense");
-		}
-		
 		void getInfoFromCam(info &infop) {
 			//just filler for now, this will all get scrapped later
 			//infop.makeDo("camera");
-			if (infop.robot.lookAtCamera("top")=='R') {std::cout<<"RTop"<<std::endl;}
-			if (infop.robot.lookAtCamera("mid")=='R') {std::cout<<"RMid"<<std::endl;}
-			if (infop.robot.lookAtCamera("bot")=='R') {std::cout<<"RBot"<<std::endl;}
+			if (infop.robot.lookWithCamera("top")=='R') {std::cout<<"RTop"<<std::endl;}
+			if (infop.robot.lookWithCamera("mid")=='R') {std::cout<<"RMid"<<std::endl;}
+			if (infop.robot.lookWithCamera("bot")=='R') {std::cout<<"RBot"<<std::endl;}
 		}
 		
 		bool checkStack(info infop) {
 			//filler, also will get scrapped later on
-			if (infop.robot.lookAtCamera("bot")==' ') {return false;}
+			if (infop.robot.lookWithCamera("bot")==' ') {return false;}
 			else {return true;}
+		}
+		
+		void path(info infop) {
+		/**
+			Grid::Location locs[30][30];
+		Grid::Location start= map.getStart();
+		int pm[30][30]; //has to be a parameter later on
+
+		for (int m=0; m<30; m++) {
+	  	for (int n=0; n<30; n++) {
+	    	locs[m][n] = make_tuple(m,n);
+	    	if (map.lookForObstacles(m,n)!='\0' && map.lookForObstacles(m,n)=='W') {
+	    		pm[m][n] = 100;
+	    		std::cout<<"wall= "<<m<<" " <<n<<std::endl;
+	    	} else {pm[m][n]=0;}
+	 		}
+		}	
+		
+		
+		Grid grid (locs);
+		for (int m=0; m<30; m++) {
+	  	for (int n=0; n<30; n++) {
+	    	
+	   		if (map.lookForStacks(m,n).getPosX()!=-1) {
+	   		int x;
+	   		int y;
+	   		tie(x,y)=start;
+	   		std::cout<< "start x= "<<x<<"\ty= "<<y<<"\n";
+	    		Grid::Location goal= std::make_tuple(m,n);
+	    		std::cout<< "goal x= "<<m<<"\ty= "<<n<<"\n";
+				route.push_back(a_star_search(grid, start, goal, pm));
+				start=goal;
+	    	} 
+	    	
+	 		}
+		}	*/
+		}
+		
+		//for testing
+		void print() {
+			int a;
+			int b;
+			int c;
+			int d;
+			bool initial=true;
+			for (a=0; a<5; a++) {
+				for (b=0; b<5; b++) {
+					if (initial) {std::cout<<"   ";for (int j=0; j<25; j++){if (j<10) {std::cout<<j<<"  ";} else {std::cout<<j<<" ";}} initial=false;};
+					std::cout<<"\n";
+					std::cout<<a<<b<<" ";
+					for (c=0; c<5; c++) {
+						for (d=0; d<5; d++) {
+							std::cout<<grids[c][a].grid[d][b]<<"  ";
+						}
+					}
+				}
+			}
+			std::cout<<"\n";
 		}
 };
 
@@ -329,55 +385,65 @@ int main() {
    		std::cout<<"done reading"<<std::endl;
 		file.close();
 		
-		//manually plot route
-		vector<tuple<int,int>> oneRoute;
+		//manually plot basic route, doesn't work for protruding maps
 		Grid::Location start= map.getStart();
+		int x;
+	   	int y;
+	   	tie(x,y)=start;
 		for (int m=0; m<10; m++) {
 	  	for (int n=0; n<10; n++) {
 	    	
 	   		if (map.lookForStacks(m,n).getPosX()!=-1) {
-	   		int x;
-	   		int y;
 	   		int p;
-	   		tie(x,y)=start;
+	   		vector<tuple<int,int>> oneRoute;
+	   		tuple<int, int> toPush;
 	   		std::cout<< "start x= "<<x<<"\ty= "<<y<<"\n";
 	    	std::cout<< "goal x= "<<m<<"\ty= "<<n<<"\n";
+
 	    		if (x<m) {
-					for (p=0;p<x-m;p++) {
-						oneRoute.push_back(std::make_tuple(x+p+1, y));
+					for (p=0;p<(m-x);) {
+						++p;
+						toPush=std::make_tuple(x+p, y);
+						std::cout<<(x+p)<<"and "<<y<<std::endl;
+						oneRoute.push_back(toPush);
 					}
 				} else if (x>m) {
-					for (p=0;p<m-x;p++) {
-						oneRoute.push_back(std::make_tuple(x-p-1, y));
-					}
-				}
-				
-				if (y<n) {
-					for (p=0;p<y-n;p++) {
-						oneRoute.push_back(std::make_tuple(x, y+p+1));
-					}
-				} else if (y>n) {
-					for (p=0;p<n-y;p++) {
-						oneRoute.push_back(std::make_tuple(x, y-p-1));
+					for (p=0;p<(x-m);) {
+						++p;
+						toPush=std::make_tuple(x-p, y);
+						std::cout<<x-p<<"and "<<y<<std::endl;
+						oneRoute.push_back(toPush);
 					}
 				}
 				x=m;
+				
+				if (y<n) {
+					for (p=0;p<(n-y);) {
+						++p;
+						toPush=std::make_tuple(x, y+p);
+						std::cout<<x<<"and "<<y+p<<std::endl;
+						oneRoute.push_back(toPush);
+					}
+				} else if (y>n) {
+					for (p=0;p<(y-n);) {
+						++p;
+						toPush=std::make_tuple(x, y-p);
+						std::cout<<x<<"and "<<y-p<<std::endl;
+						oneRoute.push_back(toPush);
+					}
+				}
+
 				y=n;
 				route.push_back(oneRoute);
 	    	} 
 	    	
 	 		}
 		}	
-		
+	
 	//make thread 
-	int positions[10][10]; 
 	Robot robot(map);
-	bool interrupt;
+	std::cin.ignore();
 	struct info infos(robot);
-	brain.stop(infos);
-	std::cout<<"command after function= " <<infos.com<<std::endl;
-	brain.getInfoFromIR(infos);
-	brain.updateGrid(infos);
 	
 	pthread_t brainthread;
 	if(pthread_create(&brainthread, NULL, robotDo , &infos)) {
@@ -386,10 +452,17 @@ int main() {
 		
 	}
 	
+	//sleep(1);
+	brain.updateGrid(infos);
+	brain.stop(infos);
+	
+	
 	if(pthread_join(brainthread, NULL)) {
 			fprintf(stderr, "Error joining thread\n");
 			return 2;
 	}
+	brain.print();
+
 	std::cout << "done program, exiting" << std::endl;
 	
 }
