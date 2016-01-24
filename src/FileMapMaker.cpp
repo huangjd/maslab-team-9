@@ -1,3 +1,6 @@
+//map creation yay, follows their specs
+
+
 #include <iostream>
 #include <string>
 #include <regex>
@@ -19,46 +22,45 @@ class Stack {
 	
 	public:
 		Stack(void): x(-1), y(-1) {};
-		
 		int getPosX () {return x;}
 		int getPosY () {return y;}
-		
 		char getTopBlock() {return cube1Clr;}
 		char getMidBlock() {return cube2Clr;}
 		char getBotBlock() {return cube3Clr;}
-		
 		Stack(vector<int> values, vector<char> colors): x(values.at(0)), y(values.at(1)), cube1Clr(colors.at(0)), cube2Clr(colors.at(1)), cube3Clr(colors.at(2)) {};
 	
 };
 
-//map with platform, stacks, startLocation, walls
 struct Map {
-
+//map with platform, stacks, startLocation, walls
 	private:
 		tuple<int, int> startLocation;
-		char grid[10][10];
-		Stack gridStacks[10][10];
+//bounds have to match with the stuff on the other program
+		char grid[30][30];
+		Stack gridStacks[30][30];
 
 	public:
 	Map (void) {};
 
+//gets startlocation
 	tuple<int, int> getStart () {
-	return startLocation;
+		return startLocation;
 	}
 
 //finds walls, platforms
 	char lookForObstacles(int x, int y) {
-		if (grid[x][y]!='\0'){
-			return grid[x][y]; 
-		}
+	if (grid[x][y]!='\0'){
+	//std::cout<<"look for obstacles"<<x<<"\t"<<y<<"\t"<<grid[x][y]<<std::endl;
+	}
+		return grid[x][y]; 
 	}
 
 	void setStart(int x, int y) {
 		startLocation=std::make_tuple(x,y);
 	}
-	
 //finds stacks
 	Stack lookForStacks(int x, int y) {
+	//std::cout<<"look for stacks"<<x<<"\t"<<y<<"\t"<<gridStacks[x][y].getPosX()<<std::endl;
 		return gridStacks[x][y];
 	}
 
@@ -79,10 +81,11 @@ struct Map {
 			}
 			int num2 = atoi(info.c_str()); 
 			nums.push_back(num2);
-		} else if (item=='S') { 							
+		} else if (item=='S') { 							//just realized I didnt actually need to use regex derp
+			string units[2];
 			for (int i=0; i<2; i++) {
 				units[i]=info.substr(0, 1); //cjanfe
-				std::cout<<units[i]<<std::endl;
+				//std::cout<<units[i]<<std::endl;
 				info=info.substr(2);
 				int num = atoi(units[i].c_str()); 
 				nums.push_back(num);
@@ -100,6 +103,7 @@ struct Map {
 			case 'P': grid[nums.at(0)][nums.at(1)]= 'P'; grid[nums.at(2)][nums.at(3)]='P'; break;
 			case 'W': grid[nums.at(0)][nums.at(1)]='W'; grid[nums.at(2)][nums.at(3)]='W'; break;	
 		}
+
 	}
 };
 
