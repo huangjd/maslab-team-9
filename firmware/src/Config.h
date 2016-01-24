@@ -12,6 +12,9 @@
 #define FTM1PIN 6
 #define FTM2PIN 25
 
+#define RX_MAX 64
+#define TX_MAX 64
+
 // IRQ
 #define ISOCHRONOUS_TIMER_PIN 6
 

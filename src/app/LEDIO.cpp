@@ -1,32 +1,30 @@
 #include "../SerialUSBHost.h"
-#include "../../firmware/src/ProtocolConstants.h"
 
 #include <iostream>
+#include <string>
+#include <unistd.h>
 using namespace std;
 
 int main() {
   SerialUSBHost host;
 
-  host.sendRaw(ECHO);
+  {
+    char recv[100];
+    host.recvRaw(recv, 100);
+    cout << recv << endl;
+  }
 
 
   while (true) {
-    char type;
-    int pin;
-    int level;
-    cin >> type >> pin >> level;
+    string out;
+    getline(cin, out);
+    host.sendCmd(out);
+    sleep(1);
 
-    uint8_t lev = level;
-
-    switch (type) {
-    case 'A':
-      host.sendCmd({0, SET_ANALOG, 2, pin, level});
-      break;
-    case 'D':
-      host.sendCmd({0, SET_DIGITAL, 2, pin, (bool)level});
-      break;
-    case 'S':
-      host.sendCmd({0, SET_PINMODE, 2, pin, level});
+    char recv[100];
+    if (host.recvRaw(recv, 100)) {
+      cout << recv << endl;
+      recv[0] = '\0';
     }
   }
 }

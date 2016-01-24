@@ -9,13 +9,7 @@ static const size_t MAX_PAYLOAD = 256;
 
 typedef uint8_t u8;
 
-inline u8 blockingSerialRead() {
-  int data;
-  while ((data = Serial.read()) == -1) {
-    // loop until a character is received
-  }
-  return data;
-}
+u8 blockingSerialRead();
 
 template <typename T>
 void sendBinary(const T& val) {
@@ -26,5 +20,15 @@ template <typename T>
 void recvBinary(T *val) {
   Serial.readBytes(val, sizeof(T));
 }
+
+enum PinType {
+  DIGITAL,
+  ANALOG,
+  PWM,
+  I2C,
+  SPI,
+};
+
+bool verifyPin(int pin, PinType type);
 
 #endif // __COMMON_H__
