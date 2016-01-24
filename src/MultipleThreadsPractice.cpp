@@ -68,12 +68,13 @@ public:
 	//currently makes all walls 5x5 in the 100x100 grid
 	//returns a vector of distance in the 100x100 grid and obstacle prob
 	vector<tuple<int, int>> getIRDataU() {
-		std::cout<<"U IR Data\n";
+		//std::cout<<"U IR Data\n";
 		vector<tuple<int,int>> IRDataU;
-		tuple<int, int> data;
+		IRDataU.push_back(std::make_tuple(1, 100));
+		/**tuple<int, int> data;
 		int i=1;
 		int y;
-		while (mapForTesting.lookForObstacles(xlocation, y)==' ' && i<5) {
+		while (mapForTesting.lookForObstacles(xlocation, y)==' ' && i<5 && y<10) {
 		//for testing, added /10
 			y=(int)(ylocation+(i/10));
 			data=std::make_tuple(i, 0);
@@ -84,17 +85,17 @@ public:
 		if (mapForTesting.lookForObstacles(xlocation, y)!=' ') {
 			data=std::make_tuple(i, 1);
 			IRDataU.push_back(data);
-		} 
+		} */
 		return IRDataU;
 	}
 	
 	vector<tuple<int, int>> getIRDataL() {
-		std::cout<<"L IR Data\n";
+		//std::cout<<"L IR Data\n";
 		vector<tuple<int,int>> IRDataL;
-		tuple<int, int> data;
+		/**tuple<int, int> data;
 		int i=1;
 		int x;
-		while (mapForTesting.lookForObstacles(x, ylocation)==' ' && i<5) {
+		while (mapForTesting.lookForObstacles(x, ylocation)==' ' && i<5 && x>0) {
 		//for testing, added /10
 			x=(int)(xlocation-(i/10));
 			data=std::make_tuple(i, 0);
@@ -105,17 +106,18 @@ public:
 		if (mapForTesting.lookForObstacles(x, ylocation)!=' ') {
 			data=std::make_tuple(i, 1);
 			IRDataL.push_back(data);
-		}
+		}*/
+		IRDataL.push_back(std::make_tuple(1, 100));
 		return IRDataL;
 	}
 	
 	vector<tuple<int, int>> getIRDataR() {
-		std::cout<<"R IR Data\n";
+		//std::cout<<"R IR Data\n";
 		vector<tuple<int,int>> IRDataR;
-		tuple<int, int> data;
+		/**tuple<int, int> data;
 		int i=1;
 		int x;
-		while (mapForTesting.lookForObstacles(x, ylocation)==' ' &&i<5) {
+		while (mapForTesting.lookForObstacles(x, ylocation)==' ' &&i<5 && x<10) {
 		//for testing, added /10
 			x=(int)(xlocation+(i/10));
 			data=std::make_tuple(i, 0);
@@ -126,7 +128,8 @@ public:
 		if (mapForTesting.lookForObstacles(x, ylocation)!=' ') {
 			data=std::make_tuple(i, 1);
 			IRDataR.push_back(data);
-		}
+		}*/
+		IRDataR.push_back(std::make_tuple(1, 100));
 		return IRDataR;
 	}
 	
@@ -159,8 +162,10 @@ void *robotDo(void *com) {
 	std::cout<< "reached multithread" << std::endl;
 	struct info *commands= (struct info*)com;
 	string command=commands->com;
+	std::cout<<"command= "<<command<<std::endl;
+	Robot rob=commands->robot;
 	while (command!="stop") {
-		Robot rob=commands->robot;
+		command=commands->com;
 		commands->IRDataU=rob.getIRDataU(); 
 		commands->IRDataL=rob.getIRDataL(); 
 		commands->IRDataR=rob.getIRDataR();
@@ -442,7 +447,6 @@ int main() {
 	
 	//make thread 
 	Robot robot(map);
-	std::cin.ignore();
 	struct info infos(robot);
 	
 	pthread_t brainthread;
@@ -451,9 +455,8 @@ int main() {
 		return 1;
 		
 	}
+	sleep(1);
 	
-	//sleep(1);
-	brain.updateGrid(infos);
 	brain.stop(infos);
 	
 	
@@ -461,6 +464,7 @@ int main() {
 			fprintf(stderr, "Error joining thread\n");
 			return 2;
 	}
+	brain.updateGrid(infos);
 	brain.print();
 
 	std::cout << "done program, exiting" << std::endl;
