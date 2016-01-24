@@ -1,6 +1,6 @@
 #include <pthread.h>
 #include <stdio.h>
-#include "PathFinderNew.cpp"
+#include "Astar.cpp"
 #include "SerialUSBHost.h"
 #include "ProtocolConstants.h" //these might have to be changed 
 #include <iostream>
