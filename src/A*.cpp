@@ -37,13 +37,12 @@ using std::string;
 
 struct Grid {
  //needs to match up
-  static const int currentBounds = 3;
+  static const int currentBounds = 30;
   typedef tuple<int,int> Location;
   Location (&allLocations)[currentBounds][currentBounds]; 
   
   //for testing
   string movementArray[currentBounds][currentBounds];
-  
   Grid(Location (&locs)[currentBounds][currentBounds]): allLocations(locs) {}//difference between array<int> and int[]?
   inline bool in_bounds(Location id) const {
   	int x, y;
@@ -195,7 +194,7 @@ vector<Grid::Location> a_star_search
   (Grid grid,
    typename Grid::Location start,
    typename Grid::Location goal,
-   int probabilityMap[3][3] //bounds must match
+   int probabilityMap[30][30] //bounds must match
    ) {
   typedef typename Grid::Location Location;
   unordered_map<Location, Location> came_from;
@@ -214,9 +213,9 @@ vector<Grid::Location> a_star_search
       
       //for testing
       std::cout << "done" << std::endl;
+      return route;
       
-      break;
-    }
+    } else {
     for (auto next : grid.neighbors(current)) {
       int x,y;
       tie (x,y) = next;
@@ -231,13 +230,13 @@ vector<Grid::Location> a_star_search
         frontier.put(next, priority);
         came_from[next] = current;
 
-      }
+      }}
     }
   }
   
 }
 
-int main() {
+/**int main() {
 	int cb = 3;//Grid::currentBounds
 	//tried setting current bounds to the one in grid but it doesn't work
 	Grid::Location locs[3][3];
@@ -252,9 +251,9 @@ int main() {
 	}	
 	pm[0][1]=100; //obstacle on (0,1)
 	Grid grid (locs);
-	
-	a_star_search(grid, start, goal, pm);
-}
+	vector<Grid::Location> route;
+	route=a_star_search(grid, start, goal, pm);
+}*/
 
 /**
 std::basic_iostream<char>::basic_ostream& operator<<(std::basic_iostream<char>::basic_ostream& out, tuple<int,int> loc) {
