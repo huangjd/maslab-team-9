@@ -36,8 +36,8 @@ struct Map {
 	private:
 		tuple<int, int> startLocation;
 //bounds have to match with the stuff on the other program
-		char grid[100][100];
-		Stack gridStacks[100][100];
+		char grid[30][30];
+		Stack gridStacks[30][30];
 
 	public:
 	Map (void) {};
@@ -49,11 +49,18 @@ struct Map {
 
 //finds walls, platforms
 	char lookForObstacles(int x, int y) {
+	if (grid[x][y]!='\0'){
+	//std::cout<<"look for obstacles"<<x<<"\t"<<y<<"\t"<<grid[x][y]<<std::endl;
+	}
 		return grid[x][y]; 
 	}
 
+	void setStart(int x, int y) {
+		startLocation=std::make_tuple(x,y);
+	}
 //finds stacks
 	Stack lookForStacks(int x, int y) {
+	//std::cout<<"look for stacks"<<x<<"\t"<<y<<"\t"<<gridStacks[x][y].getPosX()<<std::endl;
 		return gridStacks[x][y];
 	}
 
@@ -66,12 +73,10 @@ struct Map {
 		int length=info.length();
 		regex parser ("(.*?),");
 		int iteration=0;
-
 		if (item!='S') {
 			while (regex_search(info, capture, parser)==true) {
 				int num = atoi(capture.str(iteration).c_str()); 
 				nums.push_back(num);
-				++iteration;
 				info=info.substr(capture.position(iteration)+2);
 			}
 			int num2 = atoi(info.c_str()); 
@@ -79,61 +84,27 @@ struct Map {
 		} else if (item=='S') { 							//just realized I didnt actually need to use regex derp
 			string units[2];
 			for (int i=0; i<2; i++) {
-				units[i]=info.substr(i, i+1);
+				units[i]=info.substr(0, 1); //cjanfe
+				//std::cout<<units[i]<<std::endl;
 				info=info.substr(2);
 				int num = atoi(units[i].c_str()); 
 				nums.push_back(num);
 			}
-		
+
 			char *type= new char[info.length() + 1];
         	std::strcpy(type,info.c_str());
 			chars.push_back(type[0]);
 			chars.push_back(type[2]);
 			chars.push_back(type[4]);
 		}
-		
 		switch (item) {
-			case 'L': grid[nums.at(0)][nums.at(1)]='L'; break;
+			case 'L': {grid[nums.at(0)][nums.at(1)]='L'; setStart(nums.at(0), nums.at(1));}break;
 			case 'S': {Stack *stack = new Stack(nums, chars); gridStacks[nums.at(0)][nums.at(1)] =  *stack;} break;
 			case 'P': grid[nums.at(0)][nums.at(1)]= 'P'; grid[nums.at(2)][nums.at(3)]='P'; break;
 			case 'W': grid[nums.at(0)][nums.at(1)]='W'; grid[nums.at(2)][nums.at(3)]='W'; break;	
 		}
-	/**
-	std::cout << "full array= ";
-	for (int a=0; a<10; a++) {
-	for (int b=0; b<10; b++) {
-		std::cout<< a << " " << b<< " " << grid[a][b] << std::endl;
-		}
-	}
-	std::cout << "gridstacks \n";
-	for (int a=0; a<10; a++) {
-	for (int b=0; b<10; b++) {
-	bool boolean=false;
-		if (gridStacks[a][b].getPosX()!=-1) {boolean=true;}
-		std::cout<< a << " " << b<< " " << boolean << std::endl;
-		}
-	}*/
+
 	}
 };
 
-
-int main() {
-	Map map;
-	std::ifstream file ("PracticeMap.txt"); //change to file name here
-	
-	//read file
-	if (file.is_open()) { 
-		std::cout << "reading file" << std::endl;
-    	for (string line; std::getline(file, line);) {
-        	std::cout << "newline= " << line << std::endl;
-        	char *type= new char[line.length() + 1];
-        	std::strcpy(type,line.c_str()); 
-        	string remainder = line.substr(2);
-        	map.construct(type[0], remainder);
-   		} 
-   	} else {
-   		std::cout << "file not opening" << std::endl;
-   	}
-	file.close();
-}
 
