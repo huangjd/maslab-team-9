@@ -58,7 +58,7 @@
 		<Linker>
 			<Add directory="C:/opencv/mingwbuild/install/include" />
 		</Linker>
-		<Unit filename="CVTest.cpp" />
+		<Unit filename="CVFindCube.cpp" />
 		<Extensions>
 			<code_completion />
 			<envvars />

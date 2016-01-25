@@ -80,3 +80,16 @@
 	"opencv2/highgui/highgui.hpp"
 	"opencv2/imgproc/imgproc.hpp"
 
+1453710164 source:c:\users\alan\maslab-team-9\src\cv\cvfindcube.cpp
+	<iostream>
+	<vector>
+	"opencv2/highgui/highgui.hpp"
+	"opencv2/imgproc/imgproc.hpp"
+
+1453713757 source:c:\users\alan\maslab-team-9\src\cv\cvfindstack.cpp
+	<iostream>
+	<vector>
+	<math.h>
+	"opencv2/highgui/highgui.hpp"
+	"opencv2/imgproc/imgproc.hpp"
+
