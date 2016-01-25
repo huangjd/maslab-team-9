@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include "Astar.cpp"
 #include "SerialUSBHost.h"
-#include "ProtocolConstants.h" //these might have to be changed 
 #include <iostream>
 #include "FileMapMaker.cpp"
 
