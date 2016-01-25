@@ -1,12 +1,13 @@
 #include <pthread.h>
 #include <stdio.h>
-#include "Astar.cpp"
-#include "SerialUSBHost.h"
+#include "PathFinderNew.cpp"
 #include <iostream>
 #include "FileMapMaker.cpp"
 
 using std::tuple;
 using std::vector;
+pthread_mutex_t mutex;
+
 
 struct Array {
 	//because you cant put 2d arrays into 2darrays or can you
@@ -32,9 +33,10 @@ public:
 	Robot(void) {};
 	Robot(Map fake): mapForTesting(fake) {
 		std::tie(xlocation, ylocation)= mapForTesting.getStart();
-		std::cout<<"start x= "<<xlocation<<" start y= "<<ylocation<<std::endl;
+		//std::cout<<"start x= "<<xlocation<<" start y= "<<ylocation<<std::endl;
 	};
 	
+	//can walk off grid rn
 	void moveU () {
 		ylocation+=0.1;
 		std::cout<<"new y= "<<ylocation<<std::endl;
@@ -60,6 +62,7 @@ public:
 		else {std::cout<<"wrong look at camera"<<std::endl;}
 	}
 	
+	//combine this with move later
 	int getDirectionFacing() {
 		return directionFacing;
 	}
@@ -77,7 +80,7 @@ public:
 		IRDataU.push_back(std::make_tuple(1, 100));
 		/**tuple<int, int> data;
 		int i=1;
-		int y;
+		int y=(int)(ylocation+(i/10));
 		while (mapForTesting.lookForObstacles(xlocation, y)==' ' && i<5 && y<10) {
 		//for testing, added /10
 			y=(int)(ylocation+(i/10));
@@ -89,13 +92,13 @@ public:
 		if (mapForTesting.lookForObstacles(xlocation, y)!=' ') {
 			data=std::make_tuple(i, 1);
 			IRDataU.push_back(data);
-		} */
+		}*/
 		return IRDataU;
 	}
 	
 	vector<tuple<int, int>> getIRDataL() {
-		//std::cout<<"L IR Data\n";
 		vector<tuple<int,int>> IRDataL;
+		//std::cout<<"L IR Data\n";
 		/**tuple<int, int> data;
 		int i=1;
 		int x;
@@ -111,13 +114,13 @@ public:
 			data=std::make_tuple(i, 1);
 			IRDataL.push_back(data);
 		}*/
-		IRDataL.push_back(std::make_tuple(1, 100));
+		IRDataL.push_back(std::make_tuple(1, 110));
 		return IRDataL;
 	}
 	
 	vector<tuple<int, int>> getIRDataR() {
-		//std::cout<<"R IR Data\n";
 		vector<tuple<int,int>> IRDataR;
+		//std::cout<<"R IR Data\n";
 		/**tuple<int, int> data;
 		int i=1;
 		int x;
@@ -133,7 +136,7 @@ public:
 			data=std::make_tuple(i, 1);
 			IRDataR.push_back(data);
 		}*/
-		IRDataR.push_back(std::make_tuple(1, 100));
+		IRDataR.push_back(std::make_tuple(1, 111));
 		return IRDataR;
 	}
 	
@@ -157,22 +160,24 @@ struct info {
 		
 		void makeDo(string str) {	
 			com=str;
-			std::cout<< "current command= "<<com<<std::endl;
 		}
 		
 };
+
+
 
 void *robotDo(void *com) {
 	std::cout<< "reached multithread" << std::endl;
 	struct info *commands= (struct info*)com;
 	string command=commands->com;
 	std::cout<<"command= "<<command<<std::endl;
-	Robot rob=commands->robot;
 	while (command!="stop") {
 		command=commands->com;
-		commands->IRDataU=rob.getIRDataU(); 
-		commands->IRDataL=rob.getIRDataL(); 
-		commands->IRDataR=rob.getIRDataR();
+		pthread_mutex_lock(&mutex);
+		commands->IRDataU=commands->robot.getIRDataU(); 
+		commands->IRDataL=commands->robot.getIRDataL(); 
+		commands->IRDataR=commands->robot.getIRDataR();
+		pthread_mutex_unlock(&mutex);
 	}
 	std::cout<<"ending"<<std::endl;
 	return NULL;
@@ -204,32 +209,66 @@ class Brain {
 			double xprecised;
 			double yprecised;
 			tie(xprecised, yprecised)=infop.robot.getLocation();
-			tie(x, y) =infop.robot.getLocation();
-			std::cout<<"x= "<<xprecised<<" y= "<<yprecised<<std::endl;
-			int xprecise=(xprecised-x)*10;
-			int yprecise=(yprecised-y)*10;
+			x=xprecised*1.002;
+			y=yprecised*1.002;
+			int xprecise=(xprecised-double(x))*10.002;
+			int yprecise=(yprecised-double(y))*10.002;
+			//std::cout<<"x= "<<xprecised<<" y= "<<yprecised<<" and "<<"x "<<x<<" y "<<y<<"x: "<<xprecise<<"y: "<<yprecise<<std::endl;
 			
 			for (tuple<int, int> tup: infop.IRDataU) {
 				int d;
 				int p;
 				tie(d, p) = tup;
-				std::cout<<"x= "<<x<<xprecise<<" y= "<<y<<yprecise<<"\tirdatau= "<<grids[x][y].grid[xprecise][yprecise+d]<<std::endl;
-				grids[x][y].grid[xprecise][yprecise+d]+=p;
+				//std::cout<<"yprecise= "<<yprecise<<std::endl;
+				if (yprecise+d>9) {
+					int innery=y+1;
+					int newVal=yprecise+d-10;
+					//std::cout<<"reached this if"<<std::endl;
+					grids[x][innery].grid[xprecise][newVal]+=p;
+					//std::cout<<"x= "<<x<<xprecise+d<<" y= "<<innery<<yprecise<<"\tirdatar= "<<grids[x][innery].grid[newVal][yprecise]+p<<std::endl;
+				} else {
+					//std::cout<<"HERE: "<<y<<" "<<yprecise+d<<std::endl;
+					//std::cout<<"x= "<<x<<xprecise<<" y= "<<y<<yprecise+d<<"\tirdatau= "<<grids[x][y].grid[xprecise][yprecise+d]+p<<std::endl;
+					grids[x][y].grid[xprecise][yprecise+d]+=p;
+					//std::cout<<"problem spot: "<<grids[0][1].grid[0][1]<<std::endl;
+				}
+				
 			}
+			std::cout<<infop.IRDataU.size()<<std::endl;
+			//std::cout<<"done with R"<<std::endl;
 			for (tuple<int, int> tup: infop.IRDataR) {
 				int d;
 				int p;
 				tie(d, p) = tup;
-				std::cout<<"x= "<<x<<xprecise<<" y= "<<y<<yprecise<<"\tirdatar= "<<grids[x][y].grid[xprecise+d][yprecise]<<std::endl;
-				grids[x][y].grid[xprecise+d][yprecise]+=p;
+				if (xprecise+d>9) {
+					int innerx;
+					innerx=x+1;
+					int newVal=(xprecise+d)-10;
+					grids[innerx][y].grid[newVal][yprecise]+=p;
+					//std::cout<<"x= "<<innerx<<newVal<<" y= "<<y<<yprecise<<"\tirdatar= "<<grids[innerx][y].grid[newVal][yprecise]+p<<std::endl;
+				} else {
+					//std::cout<<"x= "<<x<<xprecise+d<<" y= "<<y<<yprecise<<"\tirdatar= "<<grids[x][y].grid[(xprecise+d)][yprecise]+p<<std::endl;
+					grids[x][y].grid[xprecise+d][yprecise]+=p;
+				}
 			}
+			//std::cout<<"done with U"<<std::endl;
 			for (tuple<int, int> tup: infop.IRDataL) {
 				int d;
 				int p;
 				tie(d, p) = tup;
-				std::cout<<"x= "<<x<<xprecise<<" y= "<<y<<yprecise<<"\tirdatal= "<<grids[x][y].grid[xprecise-d][yprecise]<<std::endl;
-				grids[x][y].grid[xprecise-d][yprecise]+=p;
+				if (xprecise-d<0) {
+					int innerx=x-1;
+					int newVal=xprecise-d+10;
+					grids[innerx][y].grid[newVal][yprecise]+=p;
+					//std::cout<<"x= "<<innerx<<newVal<<" y= "<<y<<yprecise<<"\tirdatar= "<<grids[innerx][y].grid[newVal][yprecise]+p<<std::endl;
+				} else {
+					//std::cout<<"x= "<<x<<(xprecise-d)<<" y= "<<y<<yprecise<<"\tirdatal= "<<grids[x][y].grid[xprecise-d][yprecise]+p<<std::endl;
+					grids[x][y].grid[xprecise-d][yprecise]+=p;
+				}
+				
 			}
+			//std::cout<<"done with L"<<std::endl;
+			//add down!!!
 			
 		}
 		
@@ -286,7 +325,17 @@ class Brain {
 		}
 		
 		void move(info &infop, char movement) {
-			if (movement=='U') {infop.robot.moveU();std::cout<<"bot moved up"<<std::endl;}
+			tuple<double, double> loc=infop.robot.getLocation();
+			int x;
+			int y;
+			double xprecise;
+			double yprecise;
+			tie (xprecise, yprecise)=loc;
+			tie (x, y) = loc;
+			int xsmall=(xprecise-double(x))*10;
+			int ysmall=(yprecise-double(y))*10;
+			grids[x][y].grid[xsmall][ysmall]+=5;
+			if (movement=='U') {infop.robot.moveU();}
 			else if (movement=='L') {infop.robot.moveL();}
 			else if (movement=='R') {infop.robot.moveR();}
 		}
@@ -358,14 +407,26 @@ class Brain {
 			int c;
 			int d;
 			bool initial=true;
-			for (a=0; a<5; a++) {
-				for (b=0; b<5; b++) {
-					if (initial) {std::cout<<"   ";for (int j=0; j<25; j++){if (j<10) {std::cout<<j<<"  ";} else {std::cout<<j<<" ";}} initial=false;};
+			for (a=0; a<3; a++) {
+				for (b=0; b<10; b++) {
+					if (initial) {std::cout<<"   ";for (int j=0; j<30; j++){if (j<10) {std::cout<<j<<"   ";} else {std::cout<<j<<"  ";}} initial=false;};
 					std::cout<<"\n";
 					std::cout<<a<<b<<" ";
-					for (c=0; c<5; c++) {
-						for (d=0; d<5; d++) {
-							std::cout<<grids[c][a].grid[d][b]<<"  ";
+					for (c=0; c<3; c++) {
+						for (d=0; d<10; d++) {
+							//std::cout<<c<<d<<" ";
+							std::cout<<grids[c][a].grid[d][b];
+							int n=grids[c][a].grid[d][b];
+							int length;
+							do {
+     							++length; 
+    							n /= 10;
+							} while (n);
+							length=4-length;
+							while (length>0) {
+								std::cout<<" ";
+								--length;
+							}
 						}
 					}
 				}
@@ -456,6 +517,12 @@ int main() {
 	Robot robot(map);
 	struct info infos(robot);
 	
+	if (pthread_mutex_init(&mutex, NULL) != 0)
+    {
+        printf("mutex creation failed\n");
+        return 1;
+    }
+    
 	pthread_t brainthread;
 	if(pthread_create(&brainthread, NULL, robotDo , &infos)) {
 		fprintf(stderr, "Error creating thread\n");
@@ -463,10 +530,11 @@ int main() {
 		
 	}
 	string str;
-
-	getline(std::cin, str);
+	
 	do {
+		if (pthread_mutex_trylock(&mutex)==0){
 		brain.updateGrid(infos);
+		pthread_mutex_unlock(&mutex);
 		getline(std::cin, str);
 		if (str=="moveU") {
 			brain.move(infos, 'U');
@@ -474,7 +542,9 @@ int main() {
 			brain.move(infos, 'R');
 		} else if (str=="moveL") {
 			brain.move(infos, 'L');
+		} 
 		}
+		
 	} while (str!="stop"); 
 	brain.stop(infos);
 	
@@ -484,7 +554,7 @@ int main() {
 			return 2;
 	}
 	brain.print();
-
+	pthread_mutex_destroy(&mutex);
 	std::cout << "done program, exiting" << std::endl;
 	
 }
