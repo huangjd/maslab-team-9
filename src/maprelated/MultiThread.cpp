@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include "PathFinderNew.cpp"
 #include <iostream>
-#include "FileMapMaker.cpp"
+#include "MapMaker.cpp"
 
 using std::tuple;
 using std::vector;
@@ -82,7 +82,7 @@ public:
 	vector<tuple<int, int>> getIRDataU() {
 		//std::cout<<"U IR Data\n";
 		vector<tuple<int,int>> IRDataU;
-		IRDataU.push_back(std::make_tuple(1, 100));
+		IRDataU.push_back(std::make_tuple(1, 0));
 		/**tuple<int, int> data;
 		int i=1;
 		int y=(int)(ylocation+(i/10));
@@ -119,7 +119,7 @@ public:
 			data=std::make_tuple(i, 1);
 			IRDataL.push_back(data);
 		}*/
-		IRDataL.push_back(std::make_tuple(1, 110));
+		IRDataL.push_back(std::make_tuple(1, 0));
 		return IRDataL;
 	}
 	
@@ -141,7 +141,7 @@ public:
 			data=std::make_tuple(i, 1);
 			IRDataR.push_back(data);
 		}*/
-		IRDataR.push_back(std::make_tuple(1, 111));
+		IRDataR.push_back(std::make_tuple(1, 0));
 		return IRDataR;
 	}
 	
@@ -163,7 +163,7 @@ public:
 			data=std::make_tuple(i, 1);
 			IRDataR.push_back(data);
 		}*/
-		IRDataD.push_back(std::make_tuple(1, 111));
+		IRDataD.push_back(std::make_tuple(1, 0));
 		return IRDataD;
 	}
 	
@@ -391,34 +391,41 @@ class Brain {
 		
 		while (route.size()!=0) {
 			vector<tuple<int, int>> nextRoute=route.front();
-			route.erase(route.begin());
-			/**for (auto &lroute: route) {
+			std::cout<<"\n\nNEW STACK!!!"<<"\n\n";
+			//getting route to new stack
+			for (auto &lroute: route) {
 			tuple<int,int> pos=lroute.front();
 			int x;
 			int y;
 			tie (x,y)=pos;
 			std::cout<<"size= "<<route.size()<<" size of smaller= "<<lroute.size()<<"\tx from path= "<<x<<" y from path= "<<y<<std::endl; 
-			}*/
-	
+			}
 			string toNewGrid;
+			
 			while (nextRoute.size()!=0) {
+			std::cout<<"\n\nTO NEXT POS IN ROUTE\n\n";
+			//getting new position in current route to stack
 				tuple<int,int> nextPos=nextRoute.front();
-				nextRoute.erase(nextRoute.begin());
 				bool check=false;
 				string str;
 				vector<tuple<int,int>> smallRoute;
+				double x1d;
+				double y1d;
+				double x2d;
+				double y2d;
 				int x1;
 				int x2;
 				int y1;
 				int y2;
-				tie (x1, y1) = infop.robot.getLocation();
-				x1*=1.001;
-				y1*=1.001;
-				tie (x2, y2) = nextPos;
-				x2*=1.001;
-				y2*=1.001;
-				std::cout<<"cl: x1= "<<x1<<" y1= "<<y1<<" np: x2= "<<x2<<" y2= "<<y2<<std::endl;
+				tie (x1d, y1d) = infop.robot.getLocation();
+				x1=x1d*1.002;
+				y1=y1d*1.002;
+				tie (x2d, y2d) = nextPos;
+				x2=x2d*1.002;
+				y2=y2d*1.002;
+				std::cout<<"CURRENT bigLC: x1= "<<x1<<" y1= "<<y1<<" bigNEXTPOS: x2= "<<x2<<" y2= "<<y2<<std::endl;
 
+				//moving on small grid to next big grid
 				Grid::Location goal;
 				Grid::Location start;
 				if (x1==x2 && y1==y2) {
@@ -428,23 +435,28 @@ class Brain {
 				if (x1==x2){
 					if (y1>y2) {
 						goal=std::make_tuple(5,0);
+						toNewGrid="moveD";
 					} else if (y2>y1) {
 						goal=std::make_tuple(5, 9);
+						toNewGrid="moveU";
 					} 
 				} else if (y1==y2) {
 					if (x1>x2) {
 						goal=std::make_tuple(0, 5);
+						toNewGrid="moveL";
 					} else if (x2>x1) {
 						goal=std::make_tuple(9, 5);
+						toNewGrid="moveR";
 					} 
 				
 				} else {std::cout<<"problem"<<std::endl;}
+				
 				//testing
 				int x_x;
 				int y_y;
 				tie(x_x, y_y)=goal;
 				
-				do {
+				while (start!=goal) {
 				double xprecised;
 				double yprecised;
 				tie (xprecised, yprecised)=infop.robot.getLocation();
@@ -455,11 +467,14 @@ class Brain {
 				int xprecise=xprecised*10.001;
 				int yprecise=yprecised*10.001;
 				start= std::make_tuple(xprecise, yprecise);
-				std::cout<<"start= "<<xprecise<<" "<<yprecise<<"\t";
-				std::cout<<"goal= "<<x_x<<" "<<y_y<<std::endl;
+				std::cout<<"smallstart= "<<xprecise<<" "<<yprecise<<"\t";
+				std::cout<<"smallgoal= "<<x_x<<" "<<y_y<<std::endl;
+				if (start==goal) {
+					//just ignore, this is bad practice but I give
+				} else {
 				//std::cout<<"size of smallRoute rn= "<<smallRoute.size()<<"\n";
 				vector<Grid::Location> smallRoute=a_star_search(grid, start, goal, grids[x][y].grid);
-				std::cout<<"size of smallRoute rn= "<<smallRoute.size()<<"\n";
+				//std::cout<<"size of smallRoute rn= "<<smallRoute.size()<<"\n";
 				smallRoute.erase(smallRoute.begin());
 				tuple<int, int> firstPos=smallRoute.front();
 				int x1_=xprecise;
@@ -481,8 +496,8 @@ class Brain {
 					}
 				
 				} else {std::cout<<"problem 2"<<std::endl;}
-				std::cout<<str<<"\t";
-				std::cout<<"to= "<<x2_<<", "<<y2_<<std::endl;
+				//std::cout<<str<<"\t";
+				//std::cout<<"to= "<<x2_<<", "<<y2_<<std::endl;
 				/**if (check) {
 					std::cout<<"check is true"<<std::endl;
 				} else {std::cout<<"check is false"<<std::endl;}*/
@@ -500,31 +515,29 @@ class Brain {
 		
 					if (str=="moveU") {
 						move(infop, 'U');
-						toNewGrid="moveU";
 						check=true;
 						//std::cout<<"check moveU?"<<"\t";
 					} else if (str=="moveR") {
 						move(infop, 'R');
-						toNewGrid="moveR";
 						check=true;
 						//std::cout<<"check moveR?\t";
 					} else if (str=="moveL") {
 						move(infop, 'L');
-						toNewGrid="moveL";
 						check=true;
 						//std::cout<<"check moveL?\t";
 					} else if (str=="moveD") {
 						move(infop, 'D');
-						toNewGrid="moveD";
 						check=true;
 						//std::cout<<"check moveD?\t";
 					}
 					}
 					
 				} while (str!="stop"); 
-				std::cout<<"\n";
-				} while (start!=goal);
-				std::cout<<"movementStr= "<<toNewGrid<<"\n";
+				//std::cout<<"\n";
+				}
+				} 
+				
+				//std::cout<<"movementStr= "<<toNewGrid<<"\n";
 				//if (check) {std::cout<<"checkis true";} else {std::cout<<"check is false";}
 				do{
 				if (pthread_mutex_trylock(&mutex)==0){
@@ -552,18 +565,23 @@ class Brain {
 					}
 					}
 				} while (toNewGrid!="stop"); 
+				//reached new big grid
 				//be careful of the final direction not being in the correct direction
 				//shouldn't happen, but might
-				getCube();
-				std::cout<<"at "<<x2<<" "<<y2<<"\n";
 				double xC;
 				double yC;
 				tie (xC, yC)=infop.robot.getLocation();
-				std::cout<<"currentPos= "<<xC<<" "<<yC<<"\n";
+				std::cout<<"currentBigPos= "<<xC<<" "<<yC<<"\n";
 				}
-		
+	
+				nextRoute.erase(nextRoute.begin());
 			}
-		
+			getCube();
+			double xx2;
+			double yy2;
+			tie (xx2, yy2)=infop.robot.getLocation();
+			std::cout<<"at "<<xx2<<" "<<yy2<<"\n";
+			route.erase(route.begin());
 		}
 		
 		}
