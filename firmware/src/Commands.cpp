@@ -1,17 +1,28 @@
 #include "Commands.h"
+#include "MessageBuffer.h"
 #include "WProgram.h"
 #include "Common.h"
 
 #include <cstring>
 
-Command::~Command() {
+#include "SPI.h"
+
+bool (*commandsRegister[64])() = {
+    badcmd, badcmd, badcmd, badcmd, badcmd, badcmd, badcmd, badcmd, // @ABCDEFG
+    badcmd, badcmd, badcmd, badcmd, badcmd, badcmd, badcmd, badcmd, // HIJKLMNO
+    badcmd, badcmd, badcmd, badcmd, badcmd, badcmd, badcmd, badcmd, // PQRSTUVW
+    badcmd, badcmd, badcmd, badcmd, badcmd, badcmd, badcmd, badcmd, // XYZ[\]^_
+    badcmd, badcmd, blink,  badcmd, badcmd, echo ,  badcmd, badcmd, // `abcdefg
+    badcmd, badcmd, badcmd, badcmd, badcmd, badcmd, badcmd, badcmd, // hijklmno
+    badcmd, badcmd, badcmd, badcmd, badcmd, badcmd, badcmd, badcmd, // pqrstuvw
+    badcmd, badcmd, badcmd, badcmd, badcmd, badcmd, badcmd, badcmd, // xyz{|}~
+};
+
+static bool badcmd() {
+  return false;
 }
 
-void Command::respond(TXBuffer *txbuf) {
-}
-
-
-bool Blink::process(const char *rxbuf) {
+static bool blink() {
   int val = 1;
   sscanf(rxbuf, "%d", &val);
   pinMode(13, OUTPUT);
@@ -24,28 +35,21 @@ bool Blink::process(const char *rxbuf) {
   return true;
 }
 
-
-bool Echo::process(const char *rxbuf) {
-  strncpy(buf, rxbuf, RX_MAX - 1);
-  return true;
-}
-
-void Echo::respond(TXBuffer *txbuf) {
-  strcpy(txbuf->buffer, buf);
+static bool echo() {
+  strncpy(txbuf->buffer, rxbuf, RX_MAX - 1);
   txbuf->send();
 }
 
-
-bool AnalogRead::process(const char *rxbuf) {
+static bool readAnalog() {
   int argn = sscanf(rxbuf, "%d", &pin);
-  return argn && verifyPin(pin, ANALOG);
-}
-
-void AnalogRead::respond(TXBuffer *txbuf) {
-  pinMode(pin, INPUT);
-  int val = analogRead(pin);
-  sprintf(txbuf->buffer, "%d", val);
-  txbuf->send();
+  if (verifyPin(pin, ANALOG)) {
+    pinMode(pin, INPUT);
+    int val = analogRead(pin);
+    sprintf(txbuf->buffer, "%d", val);
+    txbuf->send();
+    return true;
+  }
+  return false;
 }
 
 
@@ -84,3 +88,53 @@ bool DigitalWrite::process(const char *rxbuf) {
   }
   return false;
 }
+
+bool GyroCalibrate::process(const char *rxbuf) {
+  pinMode(GYRO_CS, OUTPUT);
+  digitalWrite(GYRO_CS, HIGH);
+  SPI.begin();
+
+
+  return true;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

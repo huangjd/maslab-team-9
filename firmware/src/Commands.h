@@ -4,65 +4,85 @@
 #include <cstdint>
 #include <cstdio>
 #include "Config.h"
-#include "MessageBuffer.h"
 
-class Command {
-public:
+struct TXBuffer;
+
+extern bool(*commandsRegister[64])();
+
+
+struct Command {
+
   virtual ~Command();
 
-  virtual bool process(const char *rxbuf) = 0;
-  virtual void respond(TXBuffer *txbuf);
+  virtual bool process(const char *rxbuf, TXBuffer *txbuf) = 0;
 };
 
-class Blink : public Command {
-public:
-  bool process(const char *rxbuf);
+struct Blink : public Command {
+
+  bool process(const char *rxbuf, TXBuffer *txbuf);
 };
 
-class Echo : public Command {
+struct Echo : public Command {
   char buf[RX_MAX];
-public:
-  bool process(const char *rxbuf);
-  void respond(TXBuffer *txbuf);
+
+  bool process(const char *rxbuf, TXBuffer *txbuf);
+
 };
 
-class DigitalWrite : public Command {
-public:
-  bool process(const char *rxbuf);
+struct DigitalWrite : public Command {
+
+  bool process(const char *rxbuf, TXBuffer *txbuf);
 };
 
-class AnalogWrite : public Command {
-public:
-  bool process(const char *rxbuf);
+struct AnalogWrite : public Command {
+
+  bool process(const char *rxbuf, TXBuffer *txbuf);
 };
 
-class DigitalRead : public Command {
+struct DigitalRead : public Command {
   int pin;
   int val;
-public:
-  bool process(const char *rxbuf);
-  void respond(TXBuffer *txbuf);
+
+  bool process(const char *rxbuf, TXBuffer *txbuf);
+
 };
 
-class AnalogRead : public Command {
+struct AnalogRead : public Command {
   int pin;
   int val;
-public:
-  bool process(const char *rxbuf);
-  void respond(TXBuffer *txbuf);
+
+  bool process(const char *rxbuf, TXBuffer *txbuf);
+
 };
 
-class CPUId : public Command {
-public:
-  bool process(const char *rxbuf);
-  void respond(TXBuffer *txbuf);
+struct GyroCalibrate : public Command {
+
+  bool process(const char *rxbuf, TXBuffer *txbuf);
 };
 
-class Halt : public Command {
+struct GyroRead : public Command {
+
+  bool process(const char *rxbuf, TXBuffer *txbuf);
+
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+struct Halt : public Command {
   int type;
-public:
-  bool process(const char *rxbuf);
-  void respond(TXBuffer *txbuf);
+
+  bool process(const char *rxbuf, TXBuffer *txbuf);
+
 };
 
 #endif // __COMMAND_H__

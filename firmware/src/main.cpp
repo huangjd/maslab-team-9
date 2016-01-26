@@ -65,18 +65,9 @@ void loop() {
     size_t size = Serial.readBytesUntil('\0', rxbuf, RX_MAX - 1);
     if (size) {
       rxbuf[size] = 0;
-      Command *cmd = MessageBuffer::create(rxbuf[0]);
-      if (cmd) {
-        if (cmd->process(rxbuf + 1)) {
-          cmd->respond(&txbuf);
-        } else {
-          dat();dat();gap();
-          debugPrint("Bad command format\n");
-        }
-        delete cmd;
-      } else {
-        dit();dat();dit();gap();
-        debugPrint("Unknown command\n");
+      if (!MessageBuffer::dispatch(rxbuf[0])) {
+        dat();dat();gap();
+        debugPrint("Bad command\n");
       }
     } else {
       dit();dit();gap();

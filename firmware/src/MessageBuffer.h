@@ -4,7 +4,7 @@
 #include "Config.h"
 
 class TXBuffer {
-  char buf[TX_MAX + 2];
+  char buf[TX_MAX + 3];
 public:
   char* const buffer;
 
@@ -12,13 +12,13 @@ public:
   void send();
 };
 
-extern char rxbuf[RX_MAX];
+extern char rxbuf[RX_MAX + 1];
 extern TXBuffer txbuf;
 
 class Command;
 class MessageBuffer {
 public:
-  static Command* create(char cmd);
+  static bool dispatch(char cmd);
 };
 
 #endif // __MESSAGE_BUFFER_H__

@@ -4,7 +4,7 @@
 
 #include <cstring>
 
-char rxbuf[RX_MAX];
+char rxbuf[RX_MAX + 1];
 TXBuffer txbuf;
 
 TXBuffer::TXBuffer() : buffer(buf + 1) {
@@ -19,22 +19,6 @@ void TXBuffer::send() {
 }
 
 
-Command* MessageBuffer::create(char cmd) {
-  switch (cmd) {
-  case 'A':
-    return new AnalogWrite;
-  case 'B':
-    return new Blink;
-  case 'D':
-    return new DigitalWrite;
-
-  case 'a':
-    return new AnalogRead;
-  case 'd':
-    return new DigitalRead;
-  case 'e':
-    return new Echo;
-  default:
-    return nullptr;
-  }
+bool MessageBuffer::dispatch(char cmd) {
+  return commandsRegister[cmd - (char)64]();
 }

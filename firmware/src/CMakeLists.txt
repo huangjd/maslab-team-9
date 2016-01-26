@@ -21,8 +21,12 @@ add_definitions(-std=gnu++11 -mcpu=cortex-m4 -mthumb
 
 add_library(teensy STATIC ${cpp} ${c} ${h})
 
+if(DEFINED ARDUINO_ARM_TOOL)
+   set(ARDUINO_ARM_TOOL "${ARDUINO_ARM_TOOL}/")
+endif(DEFINED ARDUINO_ARM_TOOL)
+
 add_custom_command(OUTPUT co
-                   COMMAND "${ARDUINO_ARM_TOOL}/arm-none-eabi-gcc"
+                   COMMAND "${ARDUINO_ARM_TOOL}arm-none-eabi-gcc"
                    ARGS "-Wall" "-g" "-Os"
                         "-mcpu=cortex-m4" "-mthumb" "-MMD"
                         "-DF_CPU=72000000" "-DUSB_SERIAL" "-DLAYOUT_US_ENGLISH"
@@ -33,7 +37,7 @@ add_custom_command(OUTPUT co
 add_custom_target(build_teensy_c_files ALL DEPENDS co)
 
 add_custom_command(OUTPUT cppo
-                   COMMAND "${ARDUINO_ARM_TOOL}/arm-none-eabi-g++"
+                   COMMAND "${ARDUINO_ARM_TOOL}arm-none-eabi-g++"
                    ARGS "-Wall" "-g" "-Os" "-std=gnu++11"
                         "-felide-constructors" "-fno-exceptions" "-fno-rtti"
                         "-mcpu=cortex-m4" "-mthumb" "-MMD"
@@ -46,15 +50,14 @@ add_custom_target(build_teensy_cpp_files ALL DEPENDS cppo)
 
 file(GLOB o "${CMAKE_CURRENT_BINARY_DIR}/*.o")
 add_custom_command(OUTPUT elf
-                   COMMAND "${ARDUINO_ARM_TOOL}/arm-none-eabi-gcc"
+                   COMMAND "${ARDUINO_ARM_TOOL}arm-none-eabi-gcc"
                    ARGS "-Os"
                         "-mcpu=cortex-m4" "-mthumb"
                         "-Wl,--gc-sections,--defsym=__rtc_localtime=0"
                         "--specs=nano.specs" "-T${CORE}/mk20dx256.ld" "-lm"
                         "-o" "main.elf" ${o}
-                   COMMAND "${ARDUINO_ARM_TOOL}/arm-none-eabi-size"
+                   COMMAND "${ARDUINO_ARM_TOOL}arm-none-eabi-size"
                    ARGS "${CMAKE_CURRENT_BINARY_DIR}/main.elf"
-                   COMMAND "${ARDUINO_ARM_TOOL}/arm-none-eabi-objcopy"
+                   COMMAND "${ARDUINO_ARM_TOOL}arm-none-eabi-objcopy"
                    ARGS "-O" "ihex" "-R" ".eeprom" "${CMAKE_CURRENT_BINARY_DIR}/main.elf" "main.hex")
 add_custom_target(build_teensy_main ALL DEPENDS elf)
-return()

@@ -26,7 +26,7 @@ enum PinType {
   ANALOG,
   PWM,
   I2C,
-  SPI,
+  SPI_PIN,
 };
 
 bool verifyPin(int pin, PinType type);
