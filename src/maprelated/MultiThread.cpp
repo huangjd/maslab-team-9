@@ -3,7 +3,7 @@
 #include "Astar.h"
 #include <iostream>
 #include "FileMapMaker.h"
-#include "StackGet.h"
+#include "../app/StackGet.h"
 
 using std::tuple;
 using std::vector;
