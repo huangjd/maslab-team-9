@@ -8,31 +8,6 @@
 
 using namespace std;
 
-void move_forward_to_red_block() {
-    cout << ": Moving to Red Block" << endl;
-}
-
-void move_forward_to_green_block() {
-    cout << ": Moving to Green Block" << endl;
-}
-
-void move_forward_to_block_stack()
-{
-    cout << ": Moving to Block Stack" << endl;
-}
-
-void turn_right() {
-    cout << ": Turning Right" << endl;
-}
-
-void turn_left() {
-    cout << ": Turning Left" << endl;
-}
-
-void back_up_rotate() {
-    cout << ": Cube not found - backing up and rotating." << endl;
-}
-
 void move_to(double delta_x, double delta_y) {
   double degree = atan2(delta_y, delta_x);
   turn(degree);
