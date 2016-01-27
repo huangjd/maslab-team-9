@@ -33,7 +33,7 @@ bool verifyPin(int pin, PinType type) {
   case I2C:
     return pin == 18 || pin == 19;
 
-  case SPI:
+  case SPI_PIN:
     return pin >= 10 && pin <= 13;
 
   default:

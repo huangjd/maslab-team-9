@@ -102,7 +102,7 @@ void SerialUSBHost::recvCmd(string &s) {
   read(device_fd, &s[0], (size_t)length + 1);
 }
 
-void USBProxy::USBProxyRoutine(void *arg) {
+void* USBProxy::USBProxyRoutine(void *arg) {
   USBProxy* self = reinterpret_cast<USBProxy*>(arg);
   while (self->alive) {
     bool hasCmd = false;
@@ -120,11 +120,11 @@ void USBProxy::USBProxyRoutine(void *arg) {
       string s;
       self->host.recvCmd(s);
       if (cmd.fmt) {
-        void* args[cmd.args.size()];
-        for (int i = 0; i < cmd.args.size(); i++) {
-          args[i] = cmd.args[i];
-        }
-        sscanf(&s[0], cmd.fmt);
+        cmd.args.resize(10);
+        sscanf(&s[0], cmd.fmt,
+            cmd.args[0], cmd.args[1], cmd.args[2], cmd.args[3],
+            cmd.args[4], cmd.args[5], cmd.args[6], cmd.args[7],
+            cmd.args[8], cmd.args[9]);
       } else {
         s.pop_back();
         *reinterpret_cast<string*>(cmd.args[0]) = s;
@@ -149,7 +149,7 @@ USBProxy::~USBProxy() {
   errno = 0;
   alive = false;
   timespec time = {0, 100000000};
-  if (pthread_timedjoin_np(pid, nullptr, time)) {
+  if (pthread_timedjoin_np(pid, nullptr, &time)) {
     pthread_kill(pid, SIGKILL);
   }
   if (errno) {

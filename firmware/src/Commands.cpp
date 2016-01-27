@@ -25,8 +25,8 @@ static bool blink() {
 }
 
 static bool echo() {
-  strncpy(txbuf->buffer, rxbuf + 1, RX_MAX - 1);
-  txbuf->send();
+  strncpy(txbuf.buffer, rxbuf + 1, RX_MAX - 1);
+  txbuf.send();
   return true;
 }
 
@@ -38,8 +38,8 @@ static bool readAnalog() {
   }
   pinMode(pin, INPUT);
   int val = analogRead(pin);
-  sprintf(txbuf->buffer, "%d", val);
-  txbuf->send();
+  sprintf(txbuf.buffer, "%d", val);
+  txbuf.send();
   return true;
 }
 

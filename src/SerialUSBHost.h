@@ -45,7 +45,7 @@ class USBProxy {
   std::mutex lock;
   std::list<RecvCommand> cmdQueue;
 
-  static void USBProxyRoutine(void *arg);
+  static void *USBProxyRoutine(void *arg);
 public:
 
   USBProxy();

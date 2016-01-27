@@ -37,7 +37,7 @@ void back_up_rotate() {
 
 void echo(const string &s) {
   string t = s;
-  t.insert(s.begin(), 'e');
+  t.insert(t.begin(), 'e');
   usbProxy.sendCmd(t);
   volatile bool ok = false;
   string ack;
