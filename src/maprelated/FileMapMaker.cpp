@@ -1,6 +1,6 @@
 //map creation yay, follows their specs
 
-
+#include "FileMapMaker.h"
 #include <iostream>
 #include <string>
 #include <regex>
