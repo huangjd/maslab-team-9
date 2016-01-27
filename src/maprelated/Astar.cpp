@@ -9,6 +9,7 @@
 //one of the problems is with currentBounds.
 //I can set it really big but it has to match up with the probabilitymap array 
 
+#include "Astar.h"
 #include <iostream>
 #include <iomanip>
 #include <unordered_map>
