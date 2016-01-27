@@ -1,8 +1,9 @@
 #include <pthread.h>
 #include <stdio.h>
-#include "PathFinderNew.cpp"
+#include "Astar.h"
 #include <iostream>
-#include "MapMaker.cpp"
+#include "FileMapMaker.h"
+#include "StackGet.h"
 
 using std::tuple;
 using std::vector;
