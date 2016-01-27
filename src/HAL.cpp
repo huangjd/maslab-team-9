@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+#include "SerialUSBHost.h"
+
 using namespace std;
 
 void move_forward_to_red_block() {
@@ -33,4 +35,15 @@ void back_up_rotate() {
     cout << ": Cube not found - backing up and rotating." << endl;
 }
 
+void echo(const string &s) {
+  string t = s;
+  t.insert(s.begin(), 'e');
+  usbProxy.sendCmd(t);
+  volatile bool ok = false;
+  string ack;
+  usbProxy.recvCmd(&ok, &ack);
+  while (!ok) {
 
+  }
+  cout << ack << endl;
+}

@@ -45,8 +45,8 @@ static void debugPrint(const char* c) {
 void setup() {
   dat();
 
-  //analogReadResolution(ADC_RESOLUTION);
-  //analogWriteResolution(PWM_RESOLUTION);
+  analogReadResolution(ADC_RESOLUTION);
+  analogWriteResolution(PWM_RESOLUTION);
   analogWriteFrequency(FTM0PIN, PWM0_FREQUENCY);
   analogWriteFrequency(FTM1PIN, PWM1_FREQUENCY);
   analogWriteFrequency(FTM2PIN, PWM2_FREQUENCY);
@@ -65,7 +65,7 @@ void loop() {
     size_t size = Serial.readBytesUntil('\0', rxbuf, RX_MAX - 1);
     if (size) {
       rxbuf[size] = 0;
-      if (!MessageBuffer::dispatch(rxbuf[0])) {
+      if (!MessageBuffer::dispatch()) {
         dat();dat();gap();
         debugPrint("Bad command\n");
       }

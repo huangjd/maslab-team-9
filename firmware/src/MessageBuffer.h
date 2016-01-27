@@ -18,7 +18,7 @@ extern TXBuffer txbuf;
 class Command;
 class MessageBuffer {
 public:
-  static bool dispatch(char cmd);
+  static bool dispatch();
 };
 
 #endif // __MESSAGE_BUFFER_H__

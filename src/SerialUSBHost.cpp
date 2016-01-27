@@ -1,6 +1,7 @@
 #include "SerialUSBHost.h"
 
 #include <cerrno>
+#include <cstdarg>
 #include <cstdio>
 #include <cstring>
 #include <string>
@@ -8,8 +9,7 @@
 #include <fcntl.h>
 #include <termios.h>
 #include <unistd.h>
-
-#undef ECHO
+#include <signal.h>
 
 using namespace std;
 
@@ -44,7 +44,7 @@ static int tryOpen(const char* deviceName) {
   tty.c_oflag = 0;                // no remapping, no delays
 
   tty.c_cc[VMIN]  = 0;            // read doesn't block
-  tty.c_cc[VTIME] = 1;            // 0 seconds read timeout
+  tty.c_cc[VTIME] = 0;            // 0 seconds read timeout
 
   if (tcsetattr (fd, TCSANOW, &tty) != 0) {
     return -1;
@@ -93,7 +93,105 @@ void SerialUSBHost::sendCmd(const string &s) {
 
 void SerialUSBHost::recvCmd(string &s) {
   char c;
-  read(device_fd, &c, 1);
-  s.resize((size_t)c);
-  read(device_fd, &s[0], (size_t)c);
+  do {
+    read(device_fd, &c, 1);
+  } while (c != '\x01');
+  char length;
+  read(device_fd, &length, 1);
+  s.resize((size_t)length + 1);
+  read(device_fd, &s[0], (size_t)length + 1);
 }
+
+void USBProxy::USBProxyRoutine(void *arg) {
+  USBProxy* self = reinterpret_cast<USBProxy*>(arg);
+  while (self->alive) {
+    bool hasCmd = false;
+    RecvCommand cmd;
+
+    self->lock.lock();
+    if (self->cmdQueue.size()) {
+      cmd = self->cmdQueue.front();
+      self->cmdQueue.pop_front();
+      hasCmd = true;
+    }
+    self->lock.unlock();
+
+    if (hasCmd) {
+      string s;
+      self->host.recvCmd(s);
+      if (cmd.fmt) {
+        void* args[cmd.args.size()];
+        for (int i = 0; i < cmd.args.size(); i++) {
+          args[i] = cmd.args[i];
+        }
+        sscanf(&s[0], cmd.fmt);
+      } else {
+        s.pop_back();
+        *reinterpret_cast<string*>(cmd.args[0]) = s;
+      }
+      *cmd.available = true;
+    } else {
+      pthread_yield();
+    }
+  }
+  pthread_exit(nullptr);
+}
+
+USBProxy::USBProxy() : host(), alive(true) {
+  int i = pthread_create(&pid, nullptr, USBProxyRoutine, this);
+  if (i) {
+    perror("");
+    throw exception();
+  }
+}
+
+USBProxy::~USBProxy() {
+  errno = 0;
+  alive = false;
+  timespec time = {0, 100000000};
+  if (pthread_timedjoin_np(pid, nullptr, time)) {
+    pthread_kill(pid, SIGKILL);
+  }
+  if (errno) {
+    perror("");
+  }
+}
+
+void USBProxy::sendCmd(const string &s) {
+  host.sendCmd(s);
+}
+
+void USBProxy::recvCmd(volatile bool *available, const char *fmt, ...) {
+  *available = false;
+  int argc = 0;
+  while (char c = *fmt++) {
+    if (c == '%') {
+      char next = *fmt++;
+      if (next == '\0') {
+        break;
+      } else if (next != '%') {
+        argc++;
+      }
+    }
+  }
+  std::vector<void*> args;
+  va_list ap;
+  va_start(ap, fmt);
+  for (int i = 0; i < argc; i++) {
+    args.push_back(va_arg(ap, void*));
+  }
+  va_end(ap);
+
+  lock.lock();
+  cmdQueue.push_back({available, fmt, args});
+  lock.unlock();
+}
+
+void USBProxy::recvCmd(volatile bool *available, string *s) {
+  *available = false;
+  lock.lock();
+  cmdQueue.push_back({available, nullptr, {s}});
+  lock.unlock();
+}
+
+USBProxy usbProxy;

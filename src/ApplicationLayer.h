@@ -1,6 +1,0 @@
-#ifndef __APPLICATION_LAYER_0_H__
-#define __APPLICATION_LAYER_0_H__
-
-
-
-#endif // __APPLICATION_LAYER_0_H__

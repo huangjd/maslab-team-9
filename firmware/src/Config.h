@@ -3,7 +3,7 @@
 
 #define NUM_PINS 34
 #define BAUD_RATE 115200
-#define ADC_RESOLUTION 16
+#define ADC_RESOLUTION 8
 #define PWM_RESOLUTION 8
 #define PWM0_FREQUENCY 488.28
 #define PWM1_FREQUENCY 488.28
@@ -39,7 +39,7 @@
 #define ENCODER_L_B       25
 #define ENCODER_R_A       26
 #define ENCODER_R_B       27
-#define STEPPER_R_ENABLE  28
+#define STEPPER_R_EN      28
 
 #define CLAMP_L           23
 #define CLAMP_R           22
