@@ -89,17 +89,28 @@ void SerialUSBHost::sendCmd(const string &s) {
   buf.insert(buf.end(), s.begin(), s.end());
   buf.push_back('\0');
   write(device_fd, &buf[0], buf.size());
+  fsync(device_fd);
 }
 
 void SerialUSBHost::recvCmd(string &s) {
-  char c;
-  do {
-    read(device_fd, &c, 1);
-  } while (c != '\x01');
-  char length;
-  read(device_fd, &length, 1);
-  s.resize((size_t)length + 1);
-  read(device_fd, &s[0], (size_t)length + 1);
+  char c[2];
+  char length = 0;
+  while (true) {
+    c[0] = '\0';
+    c[1] = '\0';
+    read(device_fd, c, 2);
+    if (c[0] == '\x01') {
+      length = c[1];
+      break;
+    } else if (c[1] == '\x01') {
+      read(device_fd, &length, 1);
+      break;
+    }
+  }
+  s.resize(length + 2);
+  read(device_fd, &s[0], length + 2);
+  s.pop_back();
+  s.pop_back();
 }
 
 void* USBProxy::USBProxyRoutine(void *arg) {
@@ -126,7 +137,6 @@ void* USBProxy::USBProxyRoutine(void *arg) {
             cmd.args[4], cmd.args[5], cmd.args[6], cmd.args[7],
             cmd.args[8], cmd.args[9]);
       } else {
-        s.pop_back();
         *reinterpret_cast<string*>(cmd.args[0]) = s;
       }
       *cmd.available = true;
@@ -148,9 +158,9 @@ USBProxy::USBProxy() : host(), alive(true) {
 USBProxy::~USBProxy() {
   errno = 0;
   alive = false;
-  timespec time = {0, 100000000};
+  timespec time = {0, 10000000};
   if (pthread_timedjoin_np(pid, nullptr, &time)) {
-    pthread_kill(pid, SIGKILL);
+    pthread_cancel(pid);
   }
   if (errno) {
     perror("");
@@ -164,9 +174,11 @@ void USBProxy::sendCmd(const string &s) {
 void USBProxy::recvCmd(volatile bool *available, const char *fmt, ...) {
   *available = false;
   int argc = 0;
-  while (char c = *fmt++) {
+  char c;
+  const char *ptr = fmt;
+  while (c = *ptr++) {
     if (c == '%') {
-      char next = *fmt++;
+      char next = *ptr++;
       if (next == '\0') {
         break;
       } else if (next != '%') {
@@ -174,6 +186,7 @@ void USBProxy::recvCmd(volatile bool *available, const char *fmt, ...) {
       }
     }
   }
+
   std::vector<void*> args;
   va_list ap;
   va_start(ap, fmt);
@@ -194,4 +207,119 @@ void USBProxy::recvCmd(volatile bool *available, string *s) {
   lock.unlock();
 }
 
-USBProxy usbProxy;
+void USBProxy::recvCmdBlocked(string *s) {
+  volatile bool ok = false;
+  recvCmd(&ok, s);
+  while (!ok) {
+  };
+}
+
+
+void USBProxy::recvCmdBlocked(const char *fmt, ...) {
+  volatile bool ok = false;
+  int argc = 0;
+  char c;
+  const char *ptr = fmt;
+  while (c = *ptr++) {
+    if (c == '%') {
+      char next = *ptr++;
+      if (next == '\0') {
+        break;
+      } else if (next != '%') {
+        argc++;
+      }
+    }
+  }
+
+  std::vector<void*> args;
+  va_list ap;
+  va_start(ap, fmt);
+  for (int i = 0; i < argc; i++) {
+    args.push_back(va_arg(ap, void*));
+  }
+  va_end(ap);
+
+  lock.lock();
+  cmdQueue.push_back({&ok, fmt, args});
+  lock.unlock();
+  while (!ok) {
+  };
+}
+
+void* USBProxy2::USBProxyRoutine(void *arg) {
+  USBProxy2 *self = reinterpret_cast<USBProxy2*>(arg);
+  while (self->alive) {
+    bool hasCmd = false;
+    Command cmd;
+    self->lock.lock();
+    if (self->cmdQueue.size()) {
+      hasCmd = true;
+      cmd = self->cmdQueue.front();
+      self->cmdQueue.pop_front();
+    }
+    self->lock.unlock();
+
+    if (hasCmd) {
+      self->host.sendCmd(cmd.cmd);
+      if (cmd.writeBack) {
+        self->host.recvCmd(*cmd.writeBack);
+      } else {
+        string temp;
+        self->host.recvCmd(temp);
+      }
+      if (cmd.ok) {
+        *cmd.ok = true;
+      }
+    } else {
+      pthread_yield();
+    }
+  }
+  pthread_exit(nullptr);
+}
+
+USBProxy2::USBProxy2() : host(), alive(true) {
+  int i = pthread_create(&pid, nullptr, USBProxyRoutine, this);
+  if (i) {
+    perror("");
+    throw exception();
+  }
+}
+
+USBProxy2::~USBProxy2() {
+  errno = 0;
+  alive = false;
+  timespec time = {0, 10000000};
+  if (pthread_timedjoin_np(pid, nullptr, &time)) {
+    pthread_cancel(pid);
+  }
+  if (errno) {
+    perror("");
+  }
+}
+
+
+void USBProxy2::sendCmd(const string &s, volatile bool *ok) {
+  if (ok) {
+    *ok = false;
+  }
+  lock.lock();
+  cmdQueue.push_back({s, ok, nullptr});
+  lock.unlock();
+}
+
+void USBProxy2::sendCmd(const string &s, volatile bool *ok, string &response) {
+  *ok = false;
+  lock.lock();
+  cmdQueue.push_back({s, ok, &response});
+  lock.unlock();
+}
+
+string USBProxy2::sendCmdBlocked(const string &s) {
+  volatile bool ok = false;
+  string reponse;
+  sendCmd(s, &ok, reponse);
+  while (!ok) ;
+  return reponse;
+}
+
+USBProxy2 usbProxy;

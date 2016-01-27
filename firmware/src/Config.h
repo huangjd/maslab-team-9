@@ -62,6 +62,31 @@
 #define TIMER1_IRQL 129
 #define TIMER2_IRQL 130
 
+#define LEFT  0
+#define RIGHT 1
+
+#define OPEN  0
+#define CLOSE 2
+
+#define UP    OPEN
+#define DOWN  CLOSE
+
+#define STEPPER_TWICE 4
+
+
+#define FORWARD_CONSTANT   100
+#define TURN_CONSTANT      100
+
+#define STEPPER_DELAY      50
+#define STEPPER_STEP       20
+
+#define DOOR_MOTOR_SCALE   10
+#define DOOR_MOTOR_CONSATANT 10
+
+#define CLAMP_CLOSE_PWM    120
+#define CLAMP_OPEN_PWM     130
+
+#define EMERGENCY_BACKUP_AMOUNT 200
 
 #endif // __CONFIG_H__
 

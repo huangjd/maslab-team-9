@@ -16,9 +16,11 @@ void TXBuffer::send() {
   size_t len = strlen(buffer);
   buf[0] = '\x01';
   buf[1] = (char)len;
-  buffer[len] = '\0';
-  Serial.write(buf, buf[1] + 3);
+  buffer[len] = '\n';
+  buffer[len+1] = '\0';
+  Serial.write(buf, buf[1] + 4);
   Serial.send_now();
+  buffer[0] = '\0';
 }
 
 

@@ -1,6 +1,8 @@
 #include "HAL.h"
 
+#include <cstdarg>
 #include <iostream>
+#include <cmath>
 
 #include "SerialUSBHost.h"
 
@@ -27,23 +29,59 @@ void turn_left() {
     cout << ": Turning Left" << endl;
 }
 
-void move_forward() {
-    cout << ": Going Forward" << endl;
-}
-
 void back_up_rotate() {
     cout << ": Cube not found - backing up and rotating." << endl;
 }
 
-void echo(const string &s) {
-  string t = s;
-  t.insert(t.begin(), 'e');
-  usbProxy.sendCmd(t);
-  volatile bool ok = false;
-  string ack;
-  usbProxy.recvCmd(&ok, &ack);
-  while (!ok) {
+void move_to(double delta_x, double delta_y) {
+  double degree = atan2(delta_y, delta_x);
+  turn(degree);
+  move_forward(hypot(delta_x, delta_y));
+}
 
+void move_forward(double x) {
+  char s[20];
+  sprintf(s, "M %.3f", (double)x);
+  usbProxy.sendCmd(s);
+}
+
+void turn(double deg) {
+  char s [20];
+  sprintf(s, "T %.3f", (double)deg);
+  usbProxy.sendCmd(s);
+}
+
+void echo(const string &in, string &out) {
+  volatile bool ok = false;
+  usbProxy.sendCmd(string("e") + in, &ok, out);
+  while (!ok) {
+  };
+}
+
+void pickup(bool side) {
+  if (side) {
+    usbProxy.sendCmd("P 1");
+  } else {
+    usbProxy.sendCmd("P 0");
   }
-  cout << ack << endl;
+}
+
+void release(bool side) {
+  if (side) {
+    usbProxy.sendCmd("R 1");
+  } else {
+    usbProxy.sendCmd("R 0");
+  }
+}
+
+void releaseToPlatform(bool side) {
+  if (side) {
+    usbProxy.sendCmd("R 3");
+  } else {
+    usbProxy.sendCmd("R 2");
+  }
+}
+
+void halt() {
+  usbProxy.sendCmd("H");
 }

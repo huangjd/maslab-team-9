@@ -309,7 +309,7 @@ void Camera::moveTowardsCube() {
             }
             else if(target.x < (resX - 0.25*resX)) //If cube is too far forward
             {
-                move_forward();
+                move_forward(1);
             }
 #ifndef NDEBUG
             cout << "r: " << target.x << ", " << target.y;
@@ -338,7 +338,7 @@ void Camera::moveTowardsCube() {
             }
             else if(target.x < (resX - 0.25*resX)) //If cube is too far forward
             {
-                move_forward();
+                move_forward(1);
             }
 #ifndef NDEBUG
             cout << "g: " << target.x << ", " << target.y;
@@ -392,7 +392,7 @@ void Camera::moveTowardsStack() {
             }
             else if(block.x < (resX - 0.1*resX)) //If cube is too far forward
             {
-                move_forward();
+                move_forward(1);
             }
 #ifndef NDEBUG
             cout << block.x << ", " << block.y;

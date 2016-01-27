@@ -35,16 +35,19 @@ static void gap() {
 }
 
 static void debugPrint(const char* c) {
-#ifdef FIRMWARE_DEBUG
-  Serial.write(c, strlen(c));
+  size_t len = strlen(c);
+  char buf[len + 4];
+  buf[0] = '\x01';
+  buf[1] = len;
+  strncpy(buf + 2, c, len);
+  buf[len + 2] = '\n';
+  buf[len + 3] = '\0';
+  Serial.write(buf, len + 4);
   Serial.send_now();
-#endif
 }
 
 
 void setup() {
-  dat();
-
   analogReadResolution(ADC_RESOLUTION);
   analogWriteResolution(PWM_RESOLUTION);
   analogWriteFrequency(FTM0PIN, PWM0_FREQUENCY);
@@ -56,7 +59,9 @@ void setup() {
   while (Serial.read() != -1) { // Clear serial buffer
   }
 
-  debugPrint("Module Init OK\n");
+  dat();
+
+  //debugPrint("Module Init OK\n");
 }
 
 void loop() {
@@ -66,14 +71,16 @@ void loop() {
     if (size) {
       rxbuf[size] = 0;
       if (!MessageBuffer::dispatch()) {
-        dat();dat();gap();
+        dit();dit();dit();gap();
         debugPrint("Bad command\n");
+      } else {
+        txbuf.send();
       }
     } else {
       dit();dit();gap();
       debugPrint("Empty message received\n");
     }
-  }  else if (c != -1) {
+  } else if (c != -1) {
     dit();gap();
     char msg[] = "Stray character   received\n";
     msg[16] = c;

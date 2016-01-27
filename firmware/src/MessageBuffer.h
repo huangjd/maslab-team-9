@@ -4,7 +4,7 @@
 #include "Config.h"
 
 class TXBuffer {
-  char buf[TX_MAX + 3];
+  char buf[TX_MAX + 4];
 public:
   char* const buffer;
 
