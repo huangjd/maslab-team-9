@@ -3,7 +3,7 @@
 #include <iostream>
 using namespace std;
 
-bool getStack(int argc, char **argv) {
+bool getStack() {
     //Move towards stack
     Camera cam;
 	while (true) {
@@ -13,7 +13,7 @@ bool getStack(int argc, char **argv) {
             //Move towards individual cubes
             while (true) {
                 cam.moveTowardsCube();
-                if ((cam.cubeFound >= 3) || (cam.cubeNotFound > 100) //If 3 cubes are found or timeout
+                if ((cam.cubeFound >= 3) || (cam.cubeNotFound > 100)) //If 3 cubes are found or timeout
                     return true;
             }
 

@@ -19,12 +19,13 @@ class Camera {
   cv::VideoCapture cap;
 
   const int thresCanny;
+
+public:
   int cubeNotFound;
   int cubeFound;
   int stackNotFound;
   int stackFound;
 
-public:
   Camera();
   ~Camera();
 
