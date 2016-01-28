@@ -1,5 +1,5 @@
-//map creation yay, follows their specs
-
+#ifndef _FILEMAPMAKER
+#define _FILEMAPMAKER
 
 #include <iostream>
 #include <string>
@@ -45,7 +45,7 @@ struct Map {
 //map with platform, stacks, startLocation, walls
 	private:
 		tuple<int, int> startLocation;
-		char grid[10][10]={0};
+		char grid[10][10]={{0}};
 		Stack gridStacks[10][10];
 	public:
 		Link gridLink[10][10];
@@ -178,4 +178,5 @@ struct Map {
 	
 };
 
+#endif
 
