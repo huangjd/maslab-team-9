@@ -8,7 +8,6 @@
 //start in the middle of the map
 //one of the problems is with currentBounds.
 //I can set it really big but it has to match up with the probabilitymap array 
-
 #include "Astar.h"
 #include <iostream>
 #include <iomanip>
@@ -20,6 +19,7 @@
 #include <queue>
 #include <tuple>
 #include <algorithm>
+
 
 using std::unordered_map;
 using std::unordered_set;
@@ -36,15 +36,12 @@ using std::get;
 using std::size_t;
 using std::string;
 
-struct Grid {
- //needs to match up
-  static const int currentBounds = 30;
+/**struct Grid {
+  static const int currentBounds = 10;
   typedef tuple<int,int> Location;
   Location (&allLocations)[currentBounds][currentBounds]; 
   
-  //for testing
-  string movementArray[currentBounds][currentBounds];
-  Grid(Location (&locs)[currentBounds][currentBounds]): allLocations(locs) {}//difference between array<int> and int[]?
+  //Grid(Location (&locs)[currentBounds][currentBounds]): allLocations(locs) {}
   inline bool in_bounds(Location id) const {
   	int x, y;
   	tie (x, y) = id;
@@ -71,80 +68,20 @@ struct Grid {
     std::reverse(results.begin(), results.end());
     return results;
   }
-  
-  //for testing
-  void addGridMovement(Location from, Location to);
-  void drawFinalGrid() {
-  /**std::cout<< "entire array" << std::endl;
-  for (auto &strarray: movementArray) {
-  	for (auto &str: strarray) {
-  	if (str=="") {std::cout << "empty ";}
-  	std::cout << str << std::endl;
-  	}
-  }*/
- 	std::cout << "drawing final grid" << std::endl;
-    	int i = 0;
-    	int j = 0;
-  		while (i <currentBounds) {
-  			std::cout <<  "  "<< i+1 << "-" ;
-  			++i;
-  		}
-  
-  		while (j< currentBounds) {
-  			int k = 0;
-  			std::cout << "\n";
-  			std::cout << j+1 <<"|" ;
-  			while (k<currentBounds) {
-  				if (movementArray[k][j]!="") {
-  					std::cout << " " << movementArray[k][j] << "  ";
-  				} else {
-  					std::cout << " .  "  ;
-  				}
-  				++k;
-  			}
-  			++j;
-  		}
-  	std::cout << "\n";
- } 
-};
+};*/
+
 
 namespace std{
 typedef typename Grid::Location Location;
-template <> struct std::hash<Location> {
-    std::size_t operator()(const Location k) const
+/**template <> struct hash<Location> {
+    size_t operator()(const Location k) const
     {
     int x, y;
 	tie (x, y) = k;
-      // Compute individual hash values for first,
-      // second and third and combine them using XOR
-      // and bit shifting:
-
-      return x*524287+y*37;
+    return x*524287+y*37;
     }
-  };
+  };*/
 }
-
-//for testing
-void Grid::addGridMovement(Location from, Location to) {
-  	int x1, y1, x2, y2;
-  	tie (x1, y1) = from;
-  	tie (x2, y2) = to;
-	std::cout << "from "<< x1 << ", " << y1 << " to " << x2 << ", "<< y2 <<"\t";
-	
-  	if (x1==x2) {
-  		switch (y2-y1) {
-  		case 1: movementArray[x1][y1]="\u2193"; std::cout << " \u2193" << std::endl; break;
-  		case -1: movementArray[x1][y1]="\u2191"; std::cout << " \u2191" << std::endl; break;
-  		}
-  	} else if (y1==y2) {
-  		switch (x2-x1) {
-  		case 1: movementArray[x1][y1]="\u2192"; std::cout <<  " \u2192" << std::endl; break;
-  		case -1: movementArray[x1][y1]="\u2190"; std::cout <<  " \u2190" << std::endl; break;
-  		} 
-  		
-  	}
-  	
-  }
   
 template<typename Location>
 vector<Location> reconstruct_path(Grid grid, Location start, Location goal, unordered_map<Location, Location> &came_from) {
@@ -156,11 +93,6 @@ vector<Location> reconstruct_path(Grid grid, Location start, Location goal, unor
     path.push_back(current);
   }
   std::reverse(path.begin(), path.end());
-  for (int q=0; q<path.size()-1; q++) {
-  	 std::cout << "added movement: ";
-     grid.addGridMovement(path.at(q), path.at(q+1));
-  }
-  grid.drawFinalGrid();
   
   return path;
 }
@@ -169,14 +101,13 @@ inline int heuristic(Grid::Location a, Grid::Location b) {
   int x1, y1, x2, y2;
   tie (x1, y1) = a;
   tie (x2, y2) = b;
-  return abs(x1 - x2) + abs(y1 - y2); //edit
+  return abs(x1 - x2) + abs(y1 - y2);
 }
 
 template<typename T, typename Number=int>
-struct PriorityQueue {
+/**struct PriorityQueue {
   typedef pair<Number, T> PQElement;
-  priority_queue<PQElement, vector<PQElement>, 
-                 std::greater<PQElement>> elements;
+  priority_queue<PQElement, vector<PQElement>, std::greater<PQElement>> elements;
 
   inline bool empty() const { return elements.empty(); }
 
@@ -189,14 +120,16 @@ struct PriorityQueue {
     elements.pop();
     return best_item;
   }
-};
+};*/
+vector<Grid::Location> astarsearch(Grid grid, Grid::Location start, Grid::Location goal, int probabilityMap[10][10]);
 
-vector<Grid::Location> a_star_search
+vector<Grid::Location> astarsearch
   (Grid grid,
-   typename Grid::Location start,
-   typename Grid::Location goal,
-   int probabilityMap[30][30] //bounds must match
-   ) {
+   Grid::Location start,
+    Grid::Location goal,
+   int probabilityMap[10][10]
+   ) 
+   {
   typedef typename Grid::Location Location;
   unordered_map<Location, Location> came_from;
   unordered_map<Location, int> cost_so_far;
@@ -213,7 +146,7 @@ vector<Grid::Location> a_star_search
       vector<Location> route = reconstruct_path(grid, start, goal, came_from);
       
       //for testing
-      std::cout << "done" << std::endl;
+      //std::cout << "done" << std::endl;
       return route;
       
     } else {
