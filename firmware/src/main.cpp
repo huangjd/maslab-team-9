@@ -5,6 +5,7 @@
 #include "Commands.h"
 #include "Config.h"
 #include "MessageBuffer.h"
+#include "Operation.h"
 
 static void dit() {
 #ifndef NDEBUG
@@ -77,6 +78,11 @@ void setup() {
   analogWrite(CLAMP_L, CLAMP_CLOSE_PWM);
   analogWrite(CLAMP_R, CLAMP_CLOSE_PWM);
 
+  stepperOperation(LEFT | DOWN, 10);
+  stepperOperation(RIGHT | DOWN, 10);
+  stepperOperation(LEFT | UP, STEPPER_STEP_1 + STEPPER_STEP_2);
+  stepperOperation(RIGHT | UP, STEPPER_STEP_1 + STEPPER_STEP_2);
+
   //debugPrint("Module Init OK\n");
 }
 
@@ -104,16 +110,18 @@ void loop() {
   }
 }
 
-void cpuid() {
-  uint32_t i = 0x411FC271;
-  Serial.write((uint8_t*)&i, 4);
-}
+bool StackRed = false;
 
+bool alive = true;
+
+extern bool halt();
 int main() {
   setup();
-  while(1) {
+  while(alive) {
     loop();
   }
+  halt();
+  delay(1000000);
   return 0;
 }
 

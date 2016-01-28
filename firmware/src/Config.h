@@ -71,14 +71,12 @@
 #define UP    OPEN
 #define DOWN  CLOSE
 
-#define STEPPER_TWICE 4
+#define FORWARD_CONSTANT   20
+#define TURN_CONSTANT      10
 
-
-#define FORWARD_CONSTANT   100
-#define TURN_CONSTANT      100
-
-#define STEPPER_DELAY      50
-#define STEPPER_STEP       20
+#define STEPPER_DELAY      1
+#define STEPPER_STEP_1     220
+#define STEPPER_STEP_2     440
 
 #define DOOR_MOTOR_SCALE   10
 #define DOOR_MOTOR_CONSATANT 10
@@ -86,7 +84,7 @@
 #define CLAMP_CLOSE_PWM    220
 #define CLAMP_OPEN_PWM     170
 
-#define EMERGENCY_BACKUP_AMOUNT 200
+#define EMERGENCY_BACKUP_AMOUNT 150
 
 #endif // __CONFIG_H__
 

@@ -58,7 +58,7 @@ void stepperOperation(unsigned int mode, int steps) {
 
   digitalWrite(dir, (bool)(mode & DOWN));
   delay(STEPPER_DELAY * 2);
-  int n = (mode & STEPPER_TWICE ? 2 * steps : steps);
+  int n = steps;
   for (int i = 0; i < n; i++) {
     clock(clk, STEPPER_DELAY, STEPPER_DELAY);
   }

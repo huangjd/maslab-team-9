@@ -30,10 +30,3 @@ void terminate() {
   powerdown();
   halt();
 }
-
-void halt() {
-  cli();
-  while (true) {
-    delay(1000);
-  }
-}

@@ -78,13 +78,11 @@ static bool writeDigital() {
   }
 }
 
-static bool halt() {
+bool halt() {
   analogWrite(WHEEL_SPEED_L, 0);
   analogWrite(WHEEL_SPEED_R, 0);
   digitalWrite(STEPPER_R_EN, 0);
-  digitalWrite(STEPPER_R_CLK, 0);
   digitalWrite(STEPPER_L_EN, 0);
-  digitalWrite(STEPPER_L_CLK, 0);
   digitalWrite(CONTAINER_L_1, 0);
   digitalWrite(CONTAINER_L_2, 0);
   digitalWrite(CONTAINER_R_1, 0);
@@ -96,14 +94,14 @@ static bool moveForward() {
   int val;
   if (sscanf(rxbuf, "%d", &val)) {
     if (val > 0) {
-      digitalWrite(WHEEL_DIR_L, 1);
-      digitalWrite(WHEEL_DIR_R, 0);
-    } else {
       digitalWrite(WHEEL_DIR_L, 0);
       digitalWrite(WHEEL_DIR_R, 1);
+    } else {
+      digitalWrite(WHEEL_DIR_L, 1);
+      digitalWrite(WHEEL_DIR_R, 0);
     }
-    analogWrite(WHEEL_SPEED_L, 255);
-    analogWrite(WHEEL_SPEED_R, 255);
+    analogWrite(WHEEL_SPEED_L, 127);
+    analogWrite(WHEEL_SPEED_R, 127);
     delay(abs(val) * FORWARD_CONSTANT);
     analogWrite(WHEEL_SPEED_L, 0);
     analogWrite(WHEEL_SPEED_R, 0);
@@ -113,8 +111,8 @@ static bool moveForward() {
 }
 
 static bool turn() {
-  float val;
-  if (sscanf(rxbuf, "%f", &val)) {
+  int val;
+  if (sscanf(rxbuf, "%d", &val)) {
     if (val > 0) {
       digitalWrite(WHEEL_DIR_L, 1);
       digitalWrite(WHEEL_DIR_R, 1);
@@ -122,8 +120,8 @@ static bool turn() {
       digitalWrite(WHEEL_DIR_L, 0);
       digitalWrite(WHEEL_DIR_R, 0);
     }
-    analogWrite(WHEEL_SPEED_L, 255);
-    analogWrite(WHEEL_SPEED_R, 255);
+    analogWrite(WHEEL_SPEED_L, 127);
+    analogWrite(WHEEL_SPEED_R, 127);
     delay(abs(val) * TURN_CONSTANT);
     analogWrite(WHEEL_SPEED_L, 0);
     analogWrite(WHEEL_SPEED_R, 0);
@@ -214,11 +212,11 @@ static bool readIR() {
 static bool pickup() {
   unsigned int side;
   if (sscanf(rxbuf, "%u", &side) && (side < 2)) {
-    stepperOperation(side | DOWN);
+    stepperOperation(side | DOWN, STEPPER_STEP_1);
     clampOperation(side | OPEN);
-    stepperOperation(side | DOWN);
+    stepperOperation(side | DOWN, STEPPER_STEP_2);
     clampOperation(side | CLOSE);
-    stepperOperation(side | UP | STEPPER_TWICE);
+    stepperOperation(side | UP, STEPPER_STEP_1 + STEPPER_STEP_2);
     return true;
   }
   return false;
@@ -233,11 +231,16 @@ static bool release() {
       clampOperation(mode | OPEN);
       doorOperation(mode | OPEN);
       emergencyBackUp();
+      doorOperation(mode | CLOSE);
+      clampOperation(mode | CLOSE);
     } else {
-      stepperOperation(mode | DOWN | STEPPER_TWICE);
+      stepperOperation(mode | DOWN, STEPPER_STEP_1 + STEPPER_STEP_2);
       clampOperation(mode | OPEN);
       doorOperation(mode | OPEN);
       emergencyBackUp();
+      doorOperation(mode | CLOSE);
+      stepperOperation(mode | UP, STEPPER_STEP_1 + STEPPER_STEP_2);
+      clampOperation(mode | CLOSE);
     }
     return true;
   }
@@ -245,15 +248,33 @@ static bool release() {
 }
 
 static bool endGame() {
-  return true;
+  extern bool StackRed;
+  if (StackRed) {
+    stepperOperation(RIGHT | DOWN, STEPPER_STEP_1 + STEPPER_STEP_2);
+    clampOperation(RIGHT | OPEN);
+  } else {
+    stepperOperation(LEFT | DOWN, STEPPER_STEP_1 + STEPPER_STEP_2);
+    clampOperation(LEFT | OPEN);
+  }
+  halt();
 }
 
 static bool readIRDist() {
   return false;
 }
 
+static bool setStackRed() {
+  int val;
+  extern bool StackRed;
+  if (sscanf(rxbuf, "%d", &val)) {
+    StackRed = val;
+    return true;
+  }
+  return false;
+}
+
 bool (*commandsRegister[64])() = {
-    badcmd, writeAnalog, badcmd, badcmd, writeDigital, endGame, badcmd, badcmd, // @ABCDEFG
+    badcmd, writeAnalog, badcmd, badcmd, writeDigital, endGame, badcmd, setStackRed, // @ABCDEFG
     halt, readIRDist, badcmd, badcmd, badcmd, moveForward, badcmd, badcmd, // HIJKLMNO
     pickup, badcmd, release, badcmd, turn, badcmd, badcmd, badcmd, // PQRSTUVW
     badcmd, badcmd, badcmd, badcmd, badcmd, badcmd, badcmd, badcmd, // XYZ[\]^_

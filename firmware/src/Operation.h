@@ -9,7 +9,7 @@ void clampOperation(unsigned int mode);
 
 void doorOperation(unsigned int mode);
 
-void stepperOperation(unsigned int mode, int steps = STEPPER_STEP);
+void stepperOperation(unsigned int mode, int steps);
 
 void emergencyBackUp();
 

@@ -8,6 +8,6 @@ void drop();
 void endgame();
 void powerdown();
 void terminate();
-void halt();
+bool halt();
 
 #endif // __TERMINATE_H__
