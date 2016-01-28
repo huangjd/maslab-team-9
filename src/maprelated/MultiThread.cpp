@@ -341,6 +341,7 @@ class Brain {
 				x2=x2d*1.002;
 				y2=y2d*1.002;
 
+				//this is going to be changed
 				//moving on small grid to next big grid
 				Grid::Location goal;
 				Grid::Location start;
@@ -485,6 +486,49 @@ class Brain {
 		
 };
 
+	void floodFill(int x, int y, Map &map) {
+		
+		if (x+1<10 && map.grid[x+1][y]=='\0')	{
+			map.grid[x+1][y]='W';
+			floodFill(x+1, y, map);
+		}
+		if (x-1>0 && map.grid[x-1][y]=='\0')	{
+			map.grid[x-1][y]='W';
+			floodFill(x-1, y, map);
+		}
+		if (y+1<10 && map.grid[x][y+1]=='\0')	{
+			map.grid[x][y+1]='W';
+			floodFill(x, y+1, map);
+		}
+		if (y-1>0 && map.grid[x][y-1]=='\0')	{
+			map.grid[x][y-1]='W';
+			floodFill(x, y-1, map);
+		}
+	}
+	
+	void spread(int x, int y, int grid[10][10]) {
+		int p=1;
+		while (y+p<10 && p<3) {
+			grid[x][y+p]+=50;
+			++p;
+		}
+		
+		p=1;
+		while (x-p>0 && p<3) {
+			grid[x-p][y]+=50;
+			++p;
+		}
+		p=1;
+		while (x+p<10 && p<3) {
+			grid[x+p][y]+=50;
+			++p;
+		}
+		p=1;
+		while (y-p>0 && p<3) {
+			grid[x][y-p]+=50;
+			++p;
+		}
+	}
 
 int main() {
 	Map map;
@@ -507,6 +551,120 @@ int main() {
    		std::cout<<"done reading"<<std::endl;
 		file.close();
 		
+		//flood fill
+		int x,y;
+		tie (x,y) = map.getStart();
+		Map map2=map;
+		floodFill(x,y,map2);
+		
+		for (int x=0; x<10; x++) {
+			for (int y=0; y<10; y++) {
+				int xi, yi;
+				tie (xi, yi) = map.gridLinks[x][y];
+				if (xi>0){
+					if (xi>x && yi>y) {
+						for (int p=5; p<10; p++) {
+							brain.grids[x][y].grid[p][p]+=100;
+							spread(p, p, brain.grids[x][y].grid);
+						}
+						for (int p=0; p<5; p++) {
+							brain.grids[xi][yi].grid[p][p]+=100;
+							spread(p, p, brain.grids[xi][yi].grid);
+						}
+					} else if (xi>x && yi==y) {
+						for (int p=5; p<10; p++) {
+							brain.grids[x][y].grid[p][5]+=100;
+							spread(p, 5, brain.grids[x][y].grid);
+						}
+						for (int p=0; p<5; p++) {
+							brain.grids[xi][yi].grid[p][5]+=100;
+							spread(p, 5, brain.grids[xi][yi].grid);
+						}
+					} else if (xi>x && yi<y) {
+						for (int p=5; p<10; p++) {
+							brain.grids[x][y].grid[p][9-p]+=100;
+							spread(p, 9-p, brain.grids[x][y].grid);
+						}
+						for (int p=0; p<5; p++) {
+							brain.grids[xi][yi].grid[p][9-p]+=100;
+							spread(p, 9-p, brain.grids[xi][yi].grid);
+						}
+					} else if (xi<x && yi>y) {
+						for (int p=5; p<10; p++) {
+							brain.grids[x][y].grid[9-p][p]+=100;
+							spread(9-p, p, brain.grids[x][y].grid);
+						}
+						for (int p=0; p<5; p++) {
+							brain.grids[xi][yi].grid[9-p][p]+=100;
+							spread(9-p, p, brain.grids[xi][yi].grid);
+						}
+					} else if (xi<x && yi==y) {
+						for (int p=5; p<10; p++) {
+							brain.grids[x][y].grid[9-p][5]+=100;
+							spread(9-p, 5, brain.grids[x][y].grid);
+						}
+						for (int p=0; p<5; p++) {
+							brain.grids[xi][yi].grid[9-p][5]+=100;
+							spread(9-p, 5, brain.grids[xi][yi].grid);
+						}
+					} else if (xi<x && yi<y) {
+						for (int p=5; p<10; p++) {
+							brain.grids[x][y].grid[9-p][9-p]+=100;
+							spread(9-p, 9-p, brain.grids[x][y].grid);
+						}
+						for (int p=0; p<5; p++) {
+							brain.grids[xi][yi].grid[9-p][9-p]+=100;
+							spread(9-p, 9-p, brain.grids[xi][yi].grid);
+						}
+					} else if (xi==x && yi>y) {
+						for (int p=5; p<10; p++) {
+							brain.grids[x][y].grid[5][p]+=100;
+							spread(5, p, brain.grids[x][y].grid);
+						}
+						for (int p=0; p<5; p++) {
+							brain.grids[xi][yi].grid[5][p]+=100;
+							spread(5, p, brain.grids[xi][yi].grid);
+						}
+					} else if (xi==x && yi==y) {
+						for (int p=5; p<10; p++) {
+							brain.grids[x][y].grid[5][5]+=100;
+							spread(5, 5, brain.grids[x][y].grid);
+						}
+						for (int p=0; p<5; p++) {
+							brain.grids[xi][yi].grid[5][5]+=100;
+							spread(5, 5, brain.grids[xi][yi].grid);
+						}
+					} else if (xi==x && yi<y) {
+						for (int p=5; p<10; p++) {
+							brain.grids[x][y].grid[5][9-p]+=100;
+							spread(5, 9-p, brain.grids[x][y].grid);
+						}
+						for (int p=0; p<5; p++) {
+							brain.grids[xi][yi].grid[5][9-p]+=100;
+							spread(5, 9-p, brain.grids[xi][yi].grid);
+						}
+					} 
+			}}
+		
+		}
+		
+		//for testing
+		for (int x=0; x<10; x++) {
+			for (int p=0; p<10; p++) {
+				std::cout<<"\n";
+				for (int y=0;y<10;y++) {
+					for (int q=0; q<10; q++) {
+						if (brain.grids[y][x].grid[q][p]>=100) {
+							std::cout<<".";
+						} else std::cout<<" ";
+					}
+					
+				}
+			
+			}
+		
+		}
+		
 		//run A*
 		Grid::Location locs[10][10];
 		Grid::Location start= map.getStart();
@@ -515,12 +673,15 @@ int main() {
 		for (int m=0; m<10; m++) {
 	  	for (int n=0; n<10; n++) {
 	    	locs[m][n] = make_tuple(m,n);
-	    	if (map.lookForObstacles(m,n)!='\0') {
-	    		pm[m][n] = 100;
-	    	} else {pm[m][n]=0;}
-	 		}
-		}	
+	    	if (map2.lookForObstacles(m,n)!='\0') {
+	    		pm[m][n] = 0;
+	    	} else {pm[m][n]=100;}
 
+	    	if (map.lookForObstacles(m,n)!='\0') {
+	    		pm[m][n] = 10;
+	    	} 
+		}	
+		}
 		Grid grid (locs);
 		for (int m=0; m<10; m++) {
 	  	for (int n=0; n<10; n++) {
