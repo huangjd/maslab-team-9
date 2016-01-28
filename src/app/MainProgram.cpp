@@ -18,7 +18,7 @@ struct Array {
 };
 
 class threadWatcher {
-	//timer
+	//time
 };
 
 class Robot {
