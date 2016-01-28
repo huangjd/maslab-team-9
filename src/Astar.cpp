@@ -104,7 +104,7 @@ inline int heuristic(Grid::Location a, Grid::Location b) {
   return abs(x1 - x2) + abs(y1 - y2);
 }
 
-template<typename T, typename Number=int>
+//template<typename T, typename Number=int>
 /**struct PriorityQueue {
   typedef pair<Number, T> PQElement;
   priority_queue<PQElement, vector<PQElement>, std::greater<PQElement>> elements;
@@ -121,7 +121,7 @@ template<typename T, typename Number=int>
     return best_item;
   }
 };*/
-vector<Grid::Location> astarsearch(Grid grid, Grid::Location start, Grid::Location goal, int probabilityMap[10][10]);
+//vector<Grid::Location> astarsearch(Grid grid, Grid::Location start, Grid::Location goal, int probabilityMap[10][10]);
 
 vector<Grid::Location> astarsearch
   (Grid grid,
