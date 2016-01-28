@@ -49,7 +49,7 @@ public:
 	}
 	
 	void moveL () {
-    int turni=360-directionFacing;
+    int turni=360+270-directionFacing;
     turni%=360;
     changeDirectionFacing(turni);
     double turnd=turni;
@@ -60,7 +60,7 @@ public:
 	}
 	
 	void moveR () {
-    int turni=360-directionFacing;
+    int turni=360+90-directionFacing;
     turni%=360;
     changeDirectionFacing(turni);
     double turnd=turni;
@@ -71,7 +71,7 @@ public:
 	}
 	
 	void moveD () {
-    int turni=360-directionFacing;
+    int turni=360+180-directionFacing;
     turni%=360;
     changeDirectionFacing(turni);
     double turnd=turni;
