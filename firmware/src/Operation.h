@@ -5,7 +5,7 @@
 
 void clock(int pin, int hold = 0, int d = 0);
 
-void clampOperation(unsigned int mode);
+void clampOperation(bool right, int angle);
 
 void doorOperation(unsigned int mode);
 

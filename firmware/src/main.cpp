@@ -6,6 +6,9 @@
 #include "Config.h"
 #include "MessageBuffer.h"
 #include "Operation.h"
+#include "Servo.h"
+
+Servo leftServo, rightServo;
 
 static void dit() {
 #ifndef NDEBUG
@@ -75,8 +78,11 @@ void setup() {
     pinMode(i, INPUT);
   }
 
-  analogWrite(CLAMP_L, CLAMP_CLOSE_PWM);
-  analogWrite(CLAMP_R, CLAMP_CLOSE_PWM);
+  leftServo.attach(CLAMP_L);
+  rightServo.attach(CLAMP_R);
+ // leftServo.write(0);
+ // rightServo.write(0);
+
 
   stepperOperation(LEFT | DOWN, 10);
   stepperOperation(RIGHT | DOWN, 10);

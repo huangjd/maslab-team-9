@@ -81,9 +81,8 @@
 #define DOOR_MOTOR_SCALE   10
 #define DOOR_MOTOR_CONSATANT 10
 
-#define CLAMP_CLOSE_OVERSHOOT 230
-#define CLAMP_CLOSE_PWM       220
-#define CLAMP_OPEN_PWM        170
+#define CLAMP_CLOSE           0
+#define CLAMP_OPEN            45
 
 #define EMERGENCY_BACKUP_AMOUNT 150
 

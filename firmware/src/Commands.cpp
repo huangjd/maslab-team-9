@@ -4,6 +4,8 @@
 #include "Common.h"
 #include "Operation.h"
 
+#include "Servo.h"
+
 #include <cstring>
 
 #include "SPI.h"
@@ -213,9 +215,9 @@ static bool pickup() {
   unsigned int side;
   if (sscanf(rxbuf, "%u", &side) && (side < 2)) {
     stepperOperation(side | DOWN, STEPPER_STEP_1);
-    clampOperation(side | OPEN);
+    clampOperation(side, CLAMP_OPEN);
     stepperOperation(side | DOWN, STEPPER_STEP_2);
-    clampOperation(side | CLOSE);
+    clampOperation(side, CLAMP_CLOSE);
     stepperOperation(side | UP, STEPPER_STEP_1 + STEPPER_STEP_2);
     return true;
   }
@@ -226,21 +228,19 @@ static bool release() {
   unsigned int mode;
   if (sscanf(rxbuf, "%u", &mode) && mode < 4) {
     bool platform = mode & 2;
-    mode = mode & 1;
+    bool side = mode & 1;
     if (platform) {
-      clampOperation(mode | OPEN);
-      doorOperation(mode | OPEN);
+      clampOperation(side, CLAMP_OPEN);
+      doorOperation(side | open);
       emergencyBackUp();
-      doorOperation(mode | CLOSE);
-      clampOperation(mode | CLOSE);
+      clampOperation(side, CLAMP_CLOSE);
     } else {
-      stepperOperation(mode | DOWN, STEPPER_STEP_1 + STEPPER_STEP_2);
-      clampOperation(mode | OPEN);
-      doorOperation(mode | OPEN);
+      stepperOperation(side | DOWN, STEPPER_STEP_1 + STEPPER_STEP_2);
+      clampOperation(side, CLAMP_OPEN);
+      doorOperation(side | OPEN);
       emergencyBackUp();
-      doorOperation(mode | CLOSE);
-      stepperOperation(mode | UP, STEPPER_STEP_1 + STEPPER_STEP_2);
-      clampOperation(mode | CLOSE);
+      stepperOperation(side | UP, STEPPER_STEP_1 + STEPPER_STEP_2);
+      clampOperation(side, CLAMP_CLOSE);
     }
     return true;
   }
@@ -274,8 +274,24 @@ static bool setStackRed() {
   return false;
 }
 
+
+bool ClampHL() {
+  int side;
+  int angle;
+  if (sscanf(rxbuf, "%d %d", &side, &angle)) {
+    clampOperation(side, angle);
+    return true;
+  }
+  return false;
+}
+
+bool Init() {
+
+  return true;
+}
+
 bool (*commandsRegister[64])() = {
-    badcmd, writeAnalog, badcmd, badcmd, writeDigital, endGame, badcmd, setStackRed, // @ABCDEFG
+    Init, writeAnalog, badcmd, ClampHL, writeDigital, endGame, badcmd, setStackRed, // @ABCDEFG
     halt, readIRDist, badcmd, badcmd, badcmd, moveForward, badcmd, badcmd, // HIJKLMNO
     pickup, badcmd, release, badcmd, turn, badcmd, badcmd, badcmd, // PQRSTUVW
     badcmd, badcmd, badcmd, badcmd, badcmd, badcmd, badcmd, badcmd, // XYZ[\]^_

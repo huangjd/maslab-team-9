@@ -1,5 +1,6 @@
 #include "Operation.h"
 #include "WProgram.h"
+#include "Servo.h"
 
 void clock(int pin, int hold, int d) {
   digitalWrite(pin, 1);
@@ -12,17 +13,12 @@ void clock(int pin, int hold, int d) {
   }
 }
 
-void clampOperation(unsigned int mode) {
-  unsigned int pwmPin = (mode & RIGHT ? CLAMP_R : CLAMP_L);
-  if (mode & CLOSE) {
-    analogWrite(pwmPin, CLAMP_CLOSE_OVERSHOOT);
-    delay(200);
-    analogWrite(pwmPin, CLAMP_OPEN_PWM);
-    delay(200);
-    analogWrite(pwmPin, CLAMP_CLOSE_PWM);
-
+extern Servo leftServo, rightServo;
+void clampOperation(bool right, int angle) {
+  if (right) {
+    rightServo.write(angle);
   } else {
-    analogWrite(pwmPin, CLAMP_OPEN_PWM);
+    leftServo.write(angle);
   }
 }
 
