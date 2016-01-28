@@ -231,7 +231,7 @@ static bool release() {
     bool side = mode & 1;
     if (platform) {
       clampOperation(side, CLAMP_OPEN);
-      doorOperation(side | open);
+      doorOperation(side | OPEN);
       emergencyBackUp();
       clampOperation(side, CLAMP_CLOSE);
     } else {
@@ -251,10 +251,10 @@ static bool endGame() {
   extern bool StackRed;
   if (StackRed) {
     stepperOperation(RIGHT | DOWN, STEPPER_STEP_1 + STEPPER_STEP_2);
-    clampOperation(RIGHT | OPEN);
+    clampOperation(RIGHT, CLAMP_OPEN);
   } else {
     stepperOperation(LEFT | DOWN, STEPPER_STEP_1 + STEPPER_STEP_2);
-    clampOperation(LEFT | OPEN);
+    clampOperation(LEFT, CLAMP_OPEN);
   }
   halt();
   return true;
