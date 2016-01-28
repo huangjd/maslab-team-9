@@ -48,8 +48,7 @@ void doorOperation(unsigned int mode) {
   digitalWrite(pos, 0);
 }
 
-void stepperOperation(unsigned int mode, int steps) {
-  bool right = mode & RIGHT;
+void stepperOperation(bool right, bool down, int steps) {
   unsigned int clk = (right ? STEPPER_R_CLK : STEPPER_L_CLK);
   unsigned int en = (right ? STEPPER_R_EN : STEPPER_L_EN);
   unsigned int dir = (right ? STEPPER_R_DIR : STEPPER_L_DIR);
@@ -60,10 +59,10 @@ void stepperOperation(unsigned int mode, int steps) {
 
   digitalWrite(en, 1);
 
-  digitalWrite(dir, !(bool)(mode & DOWN));
+  digitalWrite(dir, !down);
   delay(STEPPER_DELAY * 2);
-  int n = steps;
-  for (int i = 0; i < n; i++) {
+
+  for (int i = 0; i < steps; i++) {
     clock(clk, STEPPER_DELAY, STEPPER_DELAY);
   }
 

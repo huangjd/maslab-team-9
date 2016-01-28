@@ -80,14 +80,14 @@ void setup() {
 
   leftServo.attach(CLAMP_L);
   rightServo.attach(CLAMP_R);
- // leftServo.write(0);
- // rightServo.write(0);
+  leftServo.write(CLAMP_CLOSE);
+  rightServo.write(CLAMP_CLOSE);
 
 
-  stepperOperation(LEFT | DOWN, 10);
-  stepperOperation(RIGHT | DOWN, 10);
-  stepperOperation(LEFT | UP, STEPPER_STEP_1 + STEPPER_STEP_2);
-  stepperOperation(RIGHT | UP, STEPPER_STEP_1 + STEPPER_STEP_2);
+ // stepperOperation(LEFT | DOWN, 10);
+ // stepperOperation(RIGHT | DOWN, 10);
+ // stepperOperation(LEFT | UP, STEPPER_STEP_1 + STEPPER_STEP_2);
+ // stepperOperation(RIGHT | UP, STEPPER_STEP_1 + STEPPER_STEP_2);
 
   //debugPrint("Module Init OK\n");
 }

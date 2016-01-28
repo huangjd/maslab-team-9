@@ -68,8 +68,8 @@
 #define OPEN  0
 #define CLOSE 2
 
-#define UP    2
-#define DOWN  0
+#define UP    0
+#define DOWN  2
 
 #define FORWARD_CONSTANT   20
 #define TURN_CONSTANT      20
@@ -81,8 +81,8 @@
 #define DOOR_MOTOR_SCALE   10
 #define DOOR_MOTOR_CONSATANT 10
 
-#define CLAMP_CLOSE           0
-#define CLAMP_OPEN            45
+#define CLAMP_CLOSE           165
+#define CLAMP_OPEN            135
 
 #define EMERGENCY_BACKUP_AMOUNT 150
 

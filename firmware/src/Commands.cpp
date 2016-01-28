@@ -136,7 +136,7 @@ static bool step() {
   unsigned int mode;
   unsigned int n = 1;
   if (sscanf(rxbuf, "%u %u", &mode, &n) && mode < 4) {
-    stepperOperation(mode, n);
+    stepperOperation(mode & RIGHT, mode & DOWN, n);
     return true;
   }
   return false;
@@ -214,11 +214,11 @@ static bool readIR() {
 static bool pickup() {
   unsigned int side;
   if (sscanf(rxbuf, "%u", &side) && (side < 2)) {
-    stepperOperation(side | DOWN, STEPPER_STEP_1);
+    stepperOperation(side, DOWN, STEPPER_STEP_1);
     clampOperation(side, CLAMP_OPEN);
-    stepperOperation(side | DOWN, STEPPER_STEP_2);
+    stepperOperation(side, DOWN, STEPPER_STEP_2);
     clampOperation(side, CLAMP_CLOSE);
-    stepperOperation(side | UP, STEPPER_STEP_1 + STEPPER_STEP_2);
+    stepperOperation(side, UP, STEPPER_STEP_1 + STEPPER_STEP_2);
     return true;
   }
   return false;
@@ -228,18 +228,18 @@ static bool release() {
   unsigned int mode;
   if (sscanf(rxbuf, "%u", &mode) && mode < 4) {
     bool platform = mode & 2;
-    bool side = mode & 1;
+    bool side = mode & RIGHT;
     if (platform) {
       clampOperation(side, CLAMP_OPEN);
       doorOperation(side | OPEN);
       emergencyBackUp();
       clampOperation(side, CLAMP_CLOSE);
     } else {
-      stepperOperation(side | DOWN, STEPPER_STEP_1 + STEPPER_STEP_2);
+      stepperOperation(side, DOWN, STEPPER_STEP_1 + STEPPER_STEP_2);
       clampOperation(side, CLAMP_OPEN);
       doorOperation(side | OPEN);
       emergencyBackUp();
-      stepperOperation(side | UP, STEPPER_STEP_1 + STEPPER_STEP_2);
+      stepperOperation(side, UP, STEPPER_STEP_1 + STEPPER_STEP_2);
       clampOperation(side, CLAMP_CLOSE);
     }
     return true;
@@ -250,10 +250,10 @@ static bool release() {
 static bool endGame() {
   extern bool StackRed;
   if (StackRed) {
-    stepperOperation(RIGHT | DOWN, STEPPER_STEP_1 + STEPPER_STEP_2);
+    stepperOperation(RIGHT, DOWN, STEPPER_STEP_1 + STEPPER_STEP_2);
     clampOperation(RIGHT, CLAMP_OPEN);
   } else {
-    stepperOperation(LEFT | DOWN, STEPPER_STEP_1 + STEPPER_STEP_2);
+    stepperOperation(LEFT, DOWN, STEPPER_STEP_1 + STEPPER_STEP_2);
     clampOperation(LEFT, CLAMP_OPEN);
   }
   halt();
