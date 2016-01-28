@@ -3,7 +3,7 @@
 #include "Astar.h"
 #include <iostream>
 #include "FileMapMaker.h"
-#include "../app/StackGet.h"
+//#include "StackGet.h"
 
 using std::tuple;
 using std::vector;
@@ -11,9 +11,8 @@ pthread_mutex_t mutex;
 
 
 struct Array {
-	//because you cant put 2d arrays into 2darrays or can you
 	public:
-	int grid[10][10]={0};
+	int grid[10][10]={{0}};
 	Array(void) {};
 	
 };
@@ -24,7 +23,7 @@ class threadWatcher {
 
 class Robot {
 private:
-	Map mapForTesting; //delete later
+	Map mapForTesting;
 	
 	double xlocation;
 	double ylocation;
@@ -74,96 +73,31 @@ public:
 	}
 	
 	tuple<double, double> getLocation() {
-		//std::cout<<"getlocation= "<<xlocation<<", "<<ylocation<<std::endl;
 		return std::make_tuple(xlocation, ylocation);
 	}
 	
 	//currently makes all walls 5x5 in the 100x100 grid
 	//returns a vector of distance in the 100x100 grid and obstacle prob
 	vector<tuple<int, int>> getIRDataU() {
-		//std::cout<<"U IR Data\n";
 		vector<tuple<int,int>> IRDataU;
 		IRDataU.push_back(std::make_tuple(1, 0));
-		/**tuple<int, int> data;
-		int i=1;
-		int y=(int)(ylocation+(i/10));
-		while (mapForTesting.lookForObstacles(xlocation, y)==' ' && i<5 && y<10) {
-		//for testing, added /10
-			y=(int)(ylocation+(i/10));
-			data=std::make_tuple(i, 0);
-			IRDataU.push_back(data);
-			++i;
-		}
-		y=(int)(ylocation+(i/10));
-		if (mapForTesting.lookForObstacles(xlocation, y)!=' ') {
-			data=std::make_tuple(i, 1);
-			IRDataU.push_back(data);
-		}*/
 		return IRDataU;
 	}
 	
 	vector<tuple<int, int>> getIRDataL() {
 		vector<tuple<int,int>> IRDataL;
-		//std::cout<<"L IR Data\n";
-		/**tuple<int, int> data;
-		int i=1;
-		int x;
-		while (mapForTesting.lookForObstacles(x, ylocation)==' ' && i<5 && x>0) {
-		//for testing, added /10
-			x=(int)(xlocation-(i/10));
-			data=std::make_tuple(i, 0);
-			IRDataL.push_back(data);
-			++i;
-		}
-		x=(int)(ylocation-(i/10));
-		if (mapForTesting.lookForObstacles(x, ylocation)!=' ') {
-			data=std::make_tuple(i, 1);
-			IRDataL.push_back(data);
-		}*/
 		IRDataL.push_back(std::make_tuple(1, 0));
 		return IRDataL;
 	}
 	
 	vector<tuple<int, int>> getIRDataR() {
 		vector<tuple<int,int>> IRDataR;
-		//std::cout<<"R IR Data\n";
-		/**tuple<int, int> data;
-		int i=1;
-		int x;
-		while (mapForTesting.lookForObstacles(x, ylocation)==' ' &&i<5 && x<10) {
-		//for testing, added /10
-			x=(int)(xlocation+(i/10));
-			data=std::make_tuple(i, 0);
-			IRDataR.push_back(data);
-			++i;
-		}
-		x=(int)(ylocation+(i/10));
-		if (mapForTesting.lookForObstacles(x, ylocation)!=' ') {
-			data=std::make_tuple(i, 1);
-			IRDataR.push_back(data);
-		}*/
 		IRDataR.push_back(std::make_tuple(1, 0));
 		return IRDataR;
 	}
 	
 	vector<tuple<int, int>> getIRDataD() {
 		vector<tuple<int,int>> IRDataD;
-		//std::cout<<"R IR Data\n";
-		/**tuple<int, int> data;
-		int i=1;
-		int x;
-		while (mapForTesting.lookForObstacles(x, ylocation)==' ' &&i<5 && x<10) {
-		//for testing, added /10
-			x=(int)(xlocation+(i/10));
-			data=std::make_tuple(i, 0);
-			IRDataR.push_back(data);
-			++i;
-		}
-		x=(int)(ylocation+(i/10));
-		if (mapForTesting.lookForObstacles(x, ylocation)!=' ') {
-			data=std::make_tuple(i, 1);
-			IRDataR.push_back(data);
-		}*/
 		IRDataD.push_back(std::make_tuple(1, 0));
 		return IRDataD;
 	}
@@ -243,29 +177,22 @@ class Brain {
 			y=yprecised*1.002;
 			int xprecise=(xprecised-double(x))*10.002;
 			int yprecise=(yprecised-double(y))*10.002;
-			//std::cout<<"x= "<<xprecised<<" y= "<<yprecised<<" and "<<"x "<<x<<" y "<<y<<"x: "<<xprecise<<"y: "<<yprecise<<std::endl;
 			
 			for (tuple<int, int> tup: infop.IRDataU) {
 				int d;
 				int p;
 				tie(d, p) = tup;
-				//std::cout<<"yprecise= "<<yprecise<<std::endl;
+
 				if (yprecise+d>9) {
 					int innery=y+1;
 					int newVal=yprecise+d-10;
-					//std::cout<<"reached this if"<<std::endl;
 					grids[x][innery].grid[xprecise][newVal]+=p;
-					//std::cout<<"x= "<<x<<xprecise+d<<" y= "<<innery<<yprecise<<"\tirdatar= "<<grids[x][innery].grid[newVal][yprecise]+p<<std::endl;
 				} else {
-					//std::cout<<"HERE: "<<y<<" "<<yprecise+d<<std::endl;
-					//std::cout<<"x= "<<x<<xprecise<<" y= "<<y<<yprecise+d<<"\tirdatau= "<<grids[x][y].grid[xprecise][yprecise+d]+p<<std::endl;
 					grids[x][y].grid[xprecise][yprecise+d]+=p;
-					//std::cout<<"problem spot: "<<grids[0][1].grid[0][1]<<std::endl;
 				}
 				
 			}
-			//std::cout<<infop.IRDataU.size()<<std::endl;
-			//std::cout<<"done with R"<<std::endl;
+		
 			for (tuple<int, int> tup: infop.IRDataR) {
 				int d;
 				int p;
@@ -275,13 +202,13 @@ class Brain {
 					innerx=x+1;
 					int newVal=(xprecise+d)-10;
 					grids[innerx][y].grid[newVal][yprecise]+=p;
-					//std::cout<<"x= "<<innerx<<newVal<<" y= "<<y<<yprecise<<"\tirdatar= "<<grids[innerx][y].grid[newVal][yprecise]+p<<std::endl;
+					
 				} else {
-					//std::cout<<"x= "<<x<<xprecise+d<<" y= "<<y<<yprecise<<"\tirdatar= "<<grids[x][y].grid[(xprecise+d)][yprecise]+p<<std::endl;
+					
 					grids[x][y].grid[xprecise+d][yprecise]+=p;
 				}
 			}
-			//std::cout<<"done with U"<<std::endl;
+			
 			for (tuple<int, int> tup: infop.IRDataL) {
 				int d;
 				int p;
@@ -290,30 +217,24 @@ class Brain {
 					int innerx=x-1;
 					int newVal=xprecise-d+10;
 					grids[innerx][y].grid[newVal][yprecise]+=p;
-					//std::cout<<"x= "<<innerx<<newVal<<" y= "<<y<<yprecise<<"\tirdatar= "<<grids[innerx][y].grid[newVal][yprecise]+p<<std::endl;
+					
 				} else {
-					//std::cout<<"x= "<<x<<(xprecise-d)<<" y= "<<y<<yprecise<<"\tirdatal= "<<grids[x][y].grid[xprecise-d][yprecise]+p<<std::endl;
+					
 					grids[x][y].grid[xprecise-d][yprecise]+=p;
 				}
 				
 			}
-			//std::cout<<"done with L"<<std::endl;
+			
 			for (tuple<int, int> tup: infop.IRDataD) {
 				int d;
 				int p;
 				tie(d, p) = tup;
-				//std::cout<<"yprecise= "<<yprecise<<std::endl;
 				if (yprecise-d<0) {
 					int innery=y-1;
 					int newVal=yprecise-d+10;
-					//std::cout<<"reached this if"<<std::endl;
 					grids[x][innery].grid[xprecise][newVal]+=p;
-					//std::cout<<"x= "<<x<<xprecise+d<<" y= "<<innery<<yprecise<<"\tirdatar= "<<grids[x][innery].grid[newVal][yprecise]+p<<std::endl;
 				} else {
-					//std::cout<<"HERE: "<<y<<" "<<yprecise+d<<std::endl;
-					//std::cout<<"x= "<<x<<xprecise<<" y= "<<y<<yprecise+d<<"\tirdatau= "<<grids[x][y].grid[xprecise][yprecise+d]+p<<std::endl;
 					grids[x][y].grid[xprecise][yprecise-d]+=p;
-					//std::cout<<"problem spot: "<<grids[0][1].grid[0][1]<<std::endl;
 				}
 				
 			}
@@ -324,7 +245,11 @@ class Brain {
 			//break blocks
 			//get cube
 			//update count
-			std::cout<<"got cube"<<std::endl;
+			//if (StackGet.getStack()) {
+				std::cout<<"got cube"<<std::endl;
+			//} else {
+			//	std::cout<<"we screwed up"<<std::endl;
+			//}
 		
 		}
 		
@@ -363,7 +288,6 @@ class Brain {
 		
 		void getInfoFromCam(info &infop) {
 			//just filler for now, this will all get scrapped later
-			//infop.makeDo("camera");
 			if (infop.robot.lookWithCamera("top")=='R') {std::cout<<"RTop"<<std::endl;}
 			if (infop.robot.lookWithCamera("mid")=='R') {std::cout<<"RMid"<<std::endl;}
 			if (infop.robot.lookWithCamera("bot")=='R') {std::cout<<"RBot"<<std::endl;}
@@ -383,28 +307,20 @@ class Brain {
 			}	
 		}
 			Grid grid (locs);
-		//this is terrible for mazes but kind of works for the arena
-		//first figure out where you can move
-		//move until you are free to move in the general direction you are supposed to move
-		//identify current location
-		//then move from current position to edge of 10x10 grid using astar
-		//reset
+		//put in override function when surrounded by walls
 		
 		while (route.size()!=0) {
 			vector<tuple<int, int>> nextRoute=route.front();
-			//std::cout<<"\n\nNEW STACK!!!"<<"\n\n";
 			//getting route to new stack
 			for (auto &lroute: route) {
 			tuple<int,int> pos=lroute.front();
 			int x;
 			int y;
 			tie (x,y)=pos;
-			//std::cout<<"size= "<<route.size()<<" size of smaller= "<<lroute.size()<<"\tx from path= "<<x<<" y from path= "<<y<<std::endl; 
 			}
 			string toNewGrid;
 			
 			while (nextRoute.size()!=0) {
-			//std::cout<<"\n\nTO NEXT POS IN ROUTE\n\n";
 			//getting new position in current route to stack
 				tuple<int,int> nextPos=nextRoute.front();
 				bool check=false;
@@ -424,7 +340,6 @@ class Brain {
 				tie (x2d, y2d) = nextPos;
 				x2=x2d*1.002;
 				y2=y2d*1.002;
-				//std::cout<<"CURRENT bigLC: x1= "<<x1<<" y1= "<<y1<<" bigNEXTPOS: x2= "<<x2<<" y2= "<<y2<<std::endl;
 
 				//moving on small grid to next big grid
 				Grid::Location goal;
@@ -468,14 +383,10 @@ class Brain {
 				int xprecise=xprecised*10.001;
 				int yprecise=yprecised*10.001;
 				start= std::make_tuple(xprecise, yprecise);
-				//std::cout<<"smallstart= "<<xprecise<<" "<<yprecise<<"\t";
-				//std::cout<<"smallgoal= "<<x_x<<" "<<y_y<<std::endl;
+
 				if (start==goal) {
-					//just ignore, this is bad practice but I give
 				} else {
-				//std::cout<<"size of smallRoute rn= "<<smallRoute.size()<<"\n";
-				vector<Grid::Location> smallRoute=a_star_search(grid, start, goal, grids[x][y].grid);
-				//std::cout<<"size of smallRoute rn= "<<smallRoute.size()<<"\n";
+				vector<Grid::Location> smallRoute=astarsearch(grid, start, goal, grids[x][y].grid);
 				smallRoute.erase(smallRoute.begin());
 				tuple<int, int> firstPos=smallRoute.front();
 				int x1_=xprecise;
@@ -497,49 +408,35 @@ class Brain {
 					}
 				
 				} else {std::cout<<"problem 2"<<std::endl;}
-				//std::cout<<str<<"\t";
-				//std::cout<<"to= "<<x2_<<", "<<y2_<<std::endl;
-				/**if (check) {
-					std::cout<<"check is true"<<std::endl;
-				} else {std::cout<<"check is false"<<std::endl;}*/
 		
 				do {
 					if (pthread_mutex_trylock(&mutex)==0){
 					updateGrid(infop);
 					if (check) {
-						//std::cout<<"checked"<<std::endl;
 						str="stop";
 						check=false;
 					}
 					pthread_mutex_unlock(&mutex);
-					//getline(std::cin, str);
 		
 					if (str=="moveU") {
 						move(infop, 'U');
 						check=true;
-						//std::cout<<"check moveU?"<<"\t";
 					} else if (str=="moveR") {
 						move(infop, 'R');
 						check=true;
-						//std::cout<<"check moveR?\t";
 					} else if (str=="moveL") {
 						move(infop, 'L');
 						check=true;
-						//std::cout<<"check moveL?\t";
 					} else if (str=="moveD") {
 						move(infop, 'D');
 						check=true;
-						//std::cout<<"check moveD?\t";
 					}
 					}
 					
 				} while (str!="stop"); 
-				//std::cout<<"\n";
 				}
 				} 
 				
-				//std::cout<<"movementStr= "<<toNewGrid<<"\n";
-				//if (check) {std::cout<<"checkis true";} else {std::cout<<"check is false";}
 				do{
 				if (pthread_mutex_trylock(&mutex)==0){
 					updateGrid(infop);
@@ -548,7 +445,6 @@ class Brain {
 						check=false;
 					}
 					pthread_mutex_unlock(&mutex);
-					//getline(std::cin, str);
 		
 					if (toNewGrid=="moveU") {
 						move(infop, 'U');
@@ -572,7 +468,6 @@ class Brain {
 				double xC;
 				double yC;
 				tie (xC, yC)=infop.robot.getLocation();
-				//std::cout<<"currentBigPos= "<<xC<<" "<<yC<<"\n";
 				}
 	
 				nextRoute.erase(nextRoute.begin());
@@ -587,40 +482,7 @@ class Brain {
 		
 		}
 		
-		//for testing
-		void print() {
 		
-			int a;
-			int b;
-			int c;
-			int d;
-			bool initial=true;
-			for (a=0; a<3; a++) {
-				for (b=0; b<10; b++) {
-					if (initial) {std::cout<<"   ";for (int j=0; j<30; j++){if (j<10) {std::cout<<j<<"   ";} else {std::cout<<j<<"  ";}} initial=false;};
-					std::cout<<"\n";
-					std::cout<<a<<b<<" ";
-					for (c=0; c<3; c++) {
-						for (d=0; d<10; d++) {
-							//std::cout<<c<<d<<" ";
-							std::cout<<grids[c][a].grid[d][b];
-							int n=grids[c][a].grid[d][b];
-							int length;
-							do {
-     							++length; 
-    							n /= 10;
-							} while (n);
-							length=4-length;
-							while (length>0) {
-								std::cout<<" ";
-								--length;
-							}
-						}
-					}
-				}
-			}
-			std::cout<<"\n";
-		}
 };
 
 
@@ -648,7 +510,7 @@ int main() {
 		//run A*
 		Grid::Location locs[10][10];
 		Grid::Location start= map.getStart();
-		int pm[10][10]={0};
+		int pm[10][10]={{0}};
 
 		for (int m=0; m<10; m++) {
 	  	for (int n=0; n<10; n++) {
@@ -670,7 +532,7 @@ int main() {
 	   		std::cout<< "start x= "<<x<<"\ty= "<<y<<"\n";
 	    		Grid::Location goal= std::make_tuple(m,n);
 	    		std::cout<< "goal x= "<<m<<"\ty= "<<n<<"\n";
-				brain.route.push_back(a_star_search(grid, start, goal, pm));
+				brain.route.push_back(astarsearch(grid, start, goal, pm));
 				start=goal;
 	    	} 
 	    	
@@ -686,12 +548,6 @@ int main() {
 		}
 		}
 		
-		for (int pp=0; pp<10; pp++) {
-		for (int qq=0; qq<10; qq++) {
-			std::cout<<" "<<map.gridLink[pp][qq].startx<<map.gridLink[pp][qq].starty;
-		}
-		std::cout<<"\n";
-		}
 		
 	
 	//make thread 
@@ -719,8 +575,7 @@ int main() {
 			fprintf(stderr, "Error joining thread\n");
 			return 2;
 	}
-	brain.print();
+	
 	pthread_mutex_destroy(&mutex);
-	std::cout << "done program, exiting" << std::endl;
 	
 }
