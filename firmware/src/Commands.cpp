@@ -295,7 +295,7 @@ bool (*commandsRegister[64])() = {
     halt, readIRDist, badcmd, badcmd, badcmd, moveForward, badcmd, badcmd, // HIJKLMNO
     pickup, badcmd, release, badcmd, turn, badcmd, badcmd, badcmd, // PQRSTUVW
     badcmd, badcmd, badcmd, badcmd, badcmd, badcmd, badcmd, badcmd, // XYZ[\]^_
-    badcmd, readAnalog, blink, clamp, readDigital, echo,  badcmd, badcmd, // `abcdefg
+    badcmd, readAnalog, blink, badcmd, readDigital, echo,  badcmd, badcmd, // `abcdefg
     badcmd, readIR, badcmd, badcmd, badcmd, badcmd, badcmd, badcmd, // hijklmno
     badcmd, badcmd, badcmd, step, badcmd, badcmd, badcmd, badcmd, // pqrstuvw
     badcmd, badcmd, door, badcmd, badcmd, badcmd, badcmd, badcmd, // xyz{|}~
