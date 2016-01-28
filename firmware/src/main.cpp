@@ -119,7 +119,7 @@ bool StackRed = false;
 
 bool alive = true;
 
-extern bool halt();
+extern void halt();
 int main() {
   setup();
   while(alive) {

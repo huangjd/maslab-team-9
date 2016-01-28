@@ -42,8 +42,8 @@ public:
 		turn%=360;
 		changeDirectionFacing(turn);
 		double turnd=turn;
-		void turn(turnd);
-		void move_forward(1);
+    turn(turnd);
+    move_forward(1);
 		ylocation+=0.1;
 		//std::cout<<"new y= "<<ylocation<<std::endl;
 	}
@@ -53,8 +53,8 @@ public:
 		turn%=360;
 		changeDirectionFacing(turn);
 		double turnd=turn;
-		void turn(turnd);
-		void move_forward(1);
+    turn(turnd);
+    move_forward(1);
 		xlocation-=0.1;
 		//std::cout<<"new x= "<<xlocation<<std::endl;
 	}
@@ -64,8 +64,8 @@ public:
 		turn%=360;
 		changeDirectionFacing(turn);
 		double turnd=turn;
-		void turn(turnd);
-		void move_forward(1);
+    turn(turnd);
+    move_forward(1);
 		xlocation+=0.1;
 		//std::cout<<"new x= "<<xlocation<<std::endl;
 	}
@@ -75,8 +75,8 @@ public:
 		turn%=360;
 		changeDirectionFacing(turn);
 		double turnd=turn;
-		void turn(turnd);
-		void move_forward(1);
+    turn(turnd);
+    move_forward(1);
 		ylocation-=0.1;
 		//std::cout<<"new y= "<<ylocation<<std::endl;
 	}

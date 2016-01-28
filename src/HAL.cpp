@@ -14,15 +14,15 @@ void move_to(double delta_x, double delta_y) {
   move_forward(hypot(delta_x, delta_y));
 }
 
-void move_forward(double x) {
+void move_forward(int x) {
   char s[20];
-  sprintf(s, "M %.3f", (double)x);
+  sprintf(s, "M %d", x * 18);
   usbProxy.sendCmd(s);
 }
 
-void turn(double deg) {
+void turn(int deg) {
   char s [20];
-  sprintf(s, "T %.3f", (double)deg);
+  sprintf(s, "T %d", deg);
   usbProxy.sendCmd(s);
 }
 
