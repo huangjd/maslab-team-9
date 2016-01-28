@@ -64,7 +64,7 @@ void stepperOperation(unsigned int mode, int steps) {
 
   digitalWrite(en, 1);
 
-  digitalWrite(dir, (bool)(mode & DOWN));
+  digitalWrite(dir, !(bool)(mode & DOWN));
   delay(STEPPER_DELAY * 2);
   int n = steps;
   for (int i = 0; i < n; i++) {

@@ -257,6 +257,7 @@ static bool endGame() {
     clampOperation(LEFT | OPEN);
   }
   halt();
+  return true;
 }
 
 static bool readIRDist() {
