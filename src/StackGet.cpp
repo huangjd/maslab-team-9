@@ -1,4 +1,4 @@
-#include "../CV.h"
+#include "CV.h"
 #include "StackGet.h"
 #include <iostream>
 using namespace std;
