@@ -80,15 +80,9 @@ static bool writeDigital() {
   }
 }
 
-bool halt() {
-  analogWrite(WHEEL_SPEED_L, 0);
-  analogWrite(WHEEL_SPEED_R, 0);
-  digitalWrite(STEPPER_R_EN, 0);
-  digitalWrite(STEPPER_L_EN, 0);
-  digitalWrite(CONTAINER_L_1, 0);
-  digitalWrite(CONTAINER_L_2, 0);
-  digitalWrite(CONTAINER_R_1, 0);
-  digitalWrite(CONTAINER_R_2, 0);
+bool Halt() {
+  halt();
+
   return true;
 }
 
@@ -102,8 +96,8 @@ static bool moveForward() {
       digitalWrite(WHEEL_DIR_L, 1);
       digitalWrite(WHEEL_DIR_R, 0);
     }
-    analogWrite(WHEEL_SPEED_L, 127);
-    analogWrite(WHEEL_SPEED_R, 127);
+    analogWrite(WHEEL_SPEED_L, MOTOR_SPEED);
+    analogWrite(WHEEL_SPEED_R, MOTOR_SPEED);
     delay(abs(val) * FORWARD_CONSTANT);
     analogWrite(WHEEL_SPEED_L, 0);
     analogWrite(WHEEL_SPEED_R, 0);
@@ -122,8 +116,8 @@ static bool turn() {
       digitalWrite(WHEEL_DIR_L, 1);
       digitalWrite(WHEEL_DIR_R, 1);
     }
-    analogWrite(WHEEL_SPEED_L, 127);
-    analogWrite(WHEEL_SPEED_R, 127);
+    analogWrite(WHEEL_SPEED_L, MOTOR_SPEED);
+    analogWrite(WHEEL_SPEED_R, MOTOR_SPEED);
     delay(abs(val) * TURN_CONSTANT);
     analogWrite(WHEEL_SPEED_L, 0);
     analogWrite(WHEEL_SPEED_R, 0);
@@ -285,6 +279,23 @@ bool ClampHL() {
   return false;
 }
 
+bool KnockStack() {
+  digitalWrite(WHEEL_DIR_L, 0);
+  digitalWrite(WHEEL_DIR_R, 1);
+
+  analogWrite(WHEEL_SPEED_L, KNOCK_SPEED);
+  analogWrite(WHEEL_SPEED_R, KNOCK_SPEED);
+  delay(KNOCK_CONSTANT);
+
+  digitalWrite(WHEEL_DIR_L, 1);
+  digitalWrite(WHEEL_DIR_R, 0);
+  delay(KNOCK_CONSTANT);
+
+  analogWrite(WHEEL_SPEED_L, 0);
+  analogWrite(WHEEL_SPEED_R, 0);
+  return true;
+}
+
 bool Init() {
 
   return true;
@@ -292,7 +303,7 @@ bool Init() {
 
 bool (*commandsRegister[64])() = {
     Init, writeAnalog, badcmd, ClampHL, writeDigital, endGame, badcmd, setStackRed, // @ABCDEFG
-    halt, readIRDist, badcmd, badcmd, badcmd, moveForward, badcmd, badcmd, // HIJKLMNO
+    Halt, readIRDist, badcmd, KnockStack, badcmd, moveForward, badcmd, badcmd, // HIJKLMNO
     pickup, badcmd, release, badcmd, turn, badcmd, badcmd, badcmd, // PQRSTUVW
     badcmd, badcmd, badcmd, badcmd, badcmd, badcmd, badcmd, badcmd, // XYZ[\]^_
     badcmd, readAnalog, blink, badcmd, readDigital, echo,  badcmd, badcmd, // `abcdefg

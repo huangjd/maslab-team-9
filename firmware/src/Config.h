@@ -71,6 +71,11 @@
 #define UP    0
 #define DOWN  2
 
+#define MOTOR_SPEED        64
+
+#define KNOCK_SPEED        255
+#define KNOCK_CONSTANT     100
+
 #define FORWARD_CONSTANT   20
 #define TURN_CONSTANT      20
 

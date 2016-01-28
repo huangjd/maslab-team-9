@@ -13,4 +13,6 @@ void stepperOperation(bool right, bool down, int steps);
 
 void emergencyBackUp();
 
+void halt();
+
 #endif // __OPERATION_H__

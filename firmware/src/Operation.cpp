@@ -79,3 +79,18 @@ void emergencyBackUp() {
   analogWrite(WHEEL_SPEED_L, 0);
   analogWrite(WHEEL_SPEED_R, 0);
 }
+
+void halt() {
+  analogWrite(WHEEL_SPEED_L, 0);
+  analogWrite(WHEEL_SPEED_R, 0);
+  digitalWrite(STEPPER_R_EN, 0);
+  digitalWrite(STEPPER_L_EN, 0);
+  digitalWrite(CONTAINER_L_1, 0);
+  digitalWrite(CONTAINER_L_2, 0);
+  digitalWrite(CONTAINER_R_1, 0);
+  digitalWrite(CONTAINER_R_2, 0);
+
+  while (true) {
+    delay(1000);
+  }
+}
