@@ -245,7 +245,7 @@ class Brain {
 			//break blocks
 			//get cube
 			//update count
-			if (StackGet.getStack()) {
+			if (getStack()) {
 				std::cout<<"got cube"<<std::endl;
 			} else {
 			//	std::cout<<"we screwed up"<<std::endl;
