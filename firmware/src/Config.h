@@ -68,11 +68,11 @@
 #define OPEN  0
 #define CLOSE 2
 
-#define UP    OPEN
-#define DOWN  CLOSE
+#define UP    2
+#define DOWN  0
 
 #define FORWARD_CONSTANT   20
-#define TURN_CONSTANT      10
+#define TURN_CONSTANT      20
 
 #define STEPPER_DELAY      1
 #define STEPPER_STEP_1     220
@@ -81,8 +81,9 @@
 #define DOOR_MOTOR_SCALE   10
 #define DOOR_MOTOR_CONSATANT 10
 
-#define CLAMP_CLOSE_PWM    220
-#define CLAMP_OPEN_PWM     170
+#define CLAMP_CLOSE_OVERSHOOT 230
+#define CLAMP_CLOSE_PWM       220
+#define CLAMP_OPEN_PWM        170
 
 #define EMERGENCY_BACKUP_AMOUNT 150
 

@@ -114,11 +114,11 @@ static bool turn() {
   int val;
   if (sscanf(rxbuf, "%d", &val)) {
     if (val > 0) {
-      digitalWrite(WHEEL_DIR_L, 1);
-      digitalWrite(WHEEL_DIR_R, 1);
-    } else {
       digitalWrite(WHEEL_DIR_L, 0);
       digitalWrite(WHEEL_DIR_R, 0);
+    } else {
+      digitalWrite(WHEEL_DIR_L, 1);
+      digitalWrite(WHEEL_DIR_R, 1);
     }
     analogWrite(WHEEL_SPEED_L, 127);
     analogWrite(WHEEL_SPEED_R, 127);

@@ -14,8 +14,16 @@ void clock(int pin, int hold, int d) {
 
 void clampOperation(unsigned int mode) {
   unsigned int pwmPin = (mode & RIGHT ? CLAMP_R : CLAMP_L);
-  unsigned int value = (mode & CLOSE ? CLAMP_CLOSE_PWM : CLAMP_OPEN_PWM);
-  analogWrite(pwmPin, value);
+  if (mode & CLOSE) {
+    analogWrite(pwmPin, CLAMP_CLOSE_OVERSHOOT);
+    delay(200);
+    analogWrite(pwmPin, CLAMP_OPEN_PWM);
+    delay(200);
+    analogWrite(pwmPin, CLAMP_CLOSE_PWM);
+
+  } else {
+    analogWrite(pwmPin, CLAMP_OPEN_PWM);
+  }
 }
 
 void doorOperation(unsigned int mode) {
