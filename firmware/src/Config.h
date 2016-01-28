@@ -75,8 +75,8 @@
 #define TURN_CONSTANT      20
 
 #define STEPPER_DELAY      1
-#define STEPPER_STEP_1     220
-#define STEPPER_STEP_2     440
+#define STEPPER_STEP_1     260
+#define STEPPER_STEP_2     410
 
 #define DOOR_MOTOR_SCALE   10
 #define DOOR_MOTOR_CONSATANT 10
