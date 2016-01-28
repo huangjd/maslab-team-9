@@ -3,7 +3,7 @@
 #include "Astar.h"
 #include <iostream>
 #include "FileMapMaker.h"
-//#include "StackGet.h"
+#include "StackGet.h"
 
 using std::tuple;
 using std::vector;
@@ -245,11 +245,11 @@ class Brain {
 			//break blocks
 			//get cube
 			//update count
-			//if (StackGet.getStack()) {
+			/if (StackGet.getStack()) {
 				std::cout<<"got cube"<<std::endl;
-			//} else {
+			} else {
 			//	std::cout<<"we screwed up"<<std::endl;
-			//}
+			}
 		
 		}
 		
