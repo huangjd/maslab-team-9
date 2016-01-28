@@ -12,8 +12,8 @@ void back_up_rotate();
 
 
 void move_to(double delta_x, double delta_y);
-void move_forward(double x);
-void turn(double deg);
+void move_forward(int x);
+void turn(int deg);
 
 #define LEFT 0
 #define RIGHT 1

@@ -38,10 +38,10 @@ public:
 	};
 	
 	void moveU () {
-		int turn=360-directionFacing;
-		turn%=360;
-		changeDirectionFacing(turn);
-		double turnd=turn;
+    int turni=360-directionFacing;
+    turni%=360;
+    changeDirectionFacing(turni);
+    double turnd=turni;
     turn(turnd);
     move_forward(1);
 		ylocation+=0.1;
@@ -49,10 +49,10 @@ public:
 	}
 	
 	void moveL () {
-		int turn=360-directionFacing;
-		turn%=360;
-		changeDirectionFacing(turn);
-		double turnd=turn;
+    int turni=360-directionFacing;
+    turni%=360;
+    changeDirectionFacing(turni);
+    double turnd=turni;
     turn(turnd);
     move_forward(1);
 		xlocation-=0.1;
@@ -60,10 +60,10 @@ public:
 	}
 	
 	void moveR () {
-		int turn=360-directionFacing;
-		turn%=360;
-		changeDirectionFacing(turn);
-		double turnd=turn;
+    int turni=360-directionFacing;
+    turni%=360;
+    changeDirectionFacing(turni);
+    double turnd=turni;
     turn(turnd);
     move_forward(1);
 		xlocation+=0.1;
@@ -71,10 +71,10 @@ public:
 	}
 	
 	void moveD () {
-		int turn=360-directionFacing;
-		turn%=360;
-		changeDirectionFacing(turn);
-		double turnd=turn;
+    int turni=360-directionFacing;
+    turni%=360;
+    changeDirectionFacing(turni);
+    double turnd=turni;
     turn(turnd);
     move_forward(1);
 		ylocation-=0.1;
