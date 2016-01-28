@@ -20,8 +20,10 @@ class Camera {
 
   const int thresCanny;
   int cubeNotFound;
+  int cubeFound;
   int stackNotFound;
-  
+  int stackFound;
+
 public:
   Camera();
   ~Camera();

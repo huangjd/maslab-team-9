@@ -299,19 +299,20 @@ void Camera::moveTowardsCube() {
             ///Fix the decimal values
             if((target.x > (resX - 0.25*resX))&&(target.y > 0.1*resY)&&(target.y <  0.25*resY)) //If cube is in corner
             {
-                move_forward_to_red_block();
+                move_to(0, 5);
+                cubeFound++;
             }
             else if(target.y < 0.1*resY) //If cube is too far right
             {
-                turn_right();
+                turn(5);
             }
             else if(target.y > 0.25*resY) //If cube is too far left
             {
-                turn_left();
+                turn(-5);
             }
             else if(target.x < (resX - 0.25*resX)) //If cube is too far forward
             {
-                move_forward(1);
+                move_to(0, 1);
             }
 #ifdef SHOW_COUT
             cout << "r: " << target.x << ", " << target.y;
@@ -328,19 +329,20 @@ void Camera::moveTowardsCube() {
 
             if((target.x > (resX - 0.25*resX))&&(target.y > (resY - 0.25*resY))&&(target.y < (resY - 0.1*resY))) //If cube is in corner
             {
-                move_forward_to_green_block();
+                move_to(0, 5);
+                cubeFound++;
             }
             else if(target.y < (resY - 0.25*resY)) //If cube is too far right
             {
-                turn_right();
+                turn(5);
             }
             else if(target.y > (resY - 0.1*resY)) //If cube is too far left
             {
-                turn_left();
+                turn(-5);
             }
             else if(target.x < (resX - 0.25*resX)) //If cube is too far forward
             {
-                move_forward(1);
+                move_to(0, 1);
             }
 #ifdef SHOW_COUT
             cout << "g: " << target.x << ", " << target.y;
@@ -353,9 +355,13 @@ void Camera::moveTowardsCube() {
             cout << cubeNotFound << endl;
 #endif
             ///If no cube present (accounting for noise)
-            if(cubeNotFound >= 20)
+            if(stackNotFound == 20)
             {
-                back_up_rotate(); //function to back up robot and start turning in place (direction doesn't matter)
+                move_to(0, -5); //Move back
+            }
+            else if(stackNotFound > 20)
+            {
+                turn(5); //Turn
             }
         }
 }
@@ -365,7 +371,7 @@ void Camera::moveTowardsStack() {
         Mat imageDrawn;
         Mat src_bin_r;
         Mat src_bin_g;
-	Point2f block;        
+	Point2f block;
 
         cap>>image;             //Store camera livestream to frame
 
@@ -382,19 +388,20 @@ void Camera::moveTowardsStack() {
             ///Fix the decimal values
             if((block.x > (resX - 0.1*resX))&&(block.y > 0.4*resY)&&(block.y < 0.6*resY)) //If cube is in corner
             {
-                move_forward_to_block_stack();
+                move_to(0, 5);
+                stackFound = 1;
             }
             else if(block.y < 0.4*resY) //If cube is too far right
             {
-                turn_right();
+                turn(5);
             }
             else if(block.y > 0.6*resY) //If cube is too far left
             {
-                turn_left();
+                turn(-5);
             }
             else if(block.x < (resX - 0.1*resX)) //If cube is too far forward
             {
-                move_forward(1);
+                move_to(0, 1);
             }
 #ifdef SHOW_COUT
             cout << block.x << ", " << block.y;
@@ -407,9 +414,13 @@ void Camera::moveTowardsStack() {
             cout << stackNotFound << endl;
 #endif
             ///If no cube stack present (accounting for noise)
-            if(stackNotFound >= 20)
+            if(stackNotFound == 20)
             {
-                back_up_rotate(); //function to back up robot and start turning in place (direction doesn't matter)
+                move_to(0, -5); //Move back
+            }
+            else if(stackNotFound > 20)
+            {
+                turn(5); //Turn
             }
         }
 

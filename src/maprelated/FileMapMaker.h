@@ -1,5 +1,5 @@
-//map creation yay, follows their specs
-
+#ifndef _FILEMAPMAKER
+#define _FILEMAPMAKER
 
 #include <iostream>
 #include <string>
@@ -18,8 +18,8 @@ struct Link {
 		int startx;
 		int starty;
 		char dir='X';
-		//Link (void) {finishx=-1; finishy=-1; startx=0; starty=0; };
-		//Link (int finx, int finy, int stx, int sty): finishx(finx), finishy(finy), startx(stx), starty(sty) {};
+		Link (void) {finishx=-1; finishy=-1; startx=0; starty=0; };
+		Link (int finx, int finy, int stx, int sty): finishx(finx), finishy(finy), startx(stx), starty(sty) {};
 };
 
 class Stack {
@@ -31,13 +31,12 @@ class Stack {
 		char cube3Clr;
 	
 	public:
-		//Stack(void): x(-1), y(-1) {};
+		Stack(void): x(-1), y(-1) {};
 		int getPosX () {return x;}
 		int getPosY () {return y;}
 		char getTopBlock() {return cube1Clr;}
 		char getMidBlock() {return cube2Clr;}
 		char getBotBlock() {return cube3Clr;}
-		Stack() {};
 		Stack(vector<int> values, vector<char> colors): x(values.at(0)), y(values.at(1)), cube1Clr(colors.at(0)), cube2Clr(colors.at(1)), cube3Clr(colors.at(2)) {};
 	
 };
@@ -50,7 +49,7 @@ struct Map {
 		Stack gridStacks[10][10];
 	public:
 		Link gridLink[10][10];
-		//Map (void) {};
+		Map (void) {};
 		vector<Link> fork;
 
 //gets startlocation
@@ -179,4 +178,5 @@ struct Map {
 	
 };
 
+#endif
 

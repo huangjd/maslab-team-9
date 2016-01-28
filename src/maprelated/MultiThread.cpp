@@ -1,8 +1,9 @@
 #include <pthread.h>
 #include <stdio.h>
-#include "PathFinderNew.cpp"
+#include "Astar.h"
 #include <iostream>
-#include "MapMaker.cpp"
+#include "FileMapMaker.h"
+#include "../app/StackGet.h"
 
 using std::tuple;
 using std::vector;
@@ -391,19 +392,19 @@ class Brain {
 		
 		while (route.size()!=0) {
 			vector<tuple<int, int>> nextRoute=route.front();
-			std::cout<<"\n\nNEW STACK!!!"<<"\n\n";
+			//std::cout<<"\n\nNEW STACK!!!"<<"\n\n";
 			//getting route to new stack
 			for (auto &lroute: route) {
 			tuple<int,int> pos=lroute.front();
 			int x;
 			int y;
 			tie (x,y)=pos;
-			std::cout<<"size= "<<route.size()<<" size of smaller= "<<lroute.size()<<"\tx from path= "<<x<<" y from path= "<<y<<std::endl; 
+			//std::cout<<"size= "<<route.size()<<" size of smaller= "<<lroute.size()<<"\tx from path= "<<x<<" y from path= "<<y<<std::endl; 
 			}
 			string toNewGrid;
 			
 			while (nextRoute.size()!=0) {
-			std::cout<<"\n\nTO NEXT POS IN ROUTE\n\n";
+			//std::cout<<"\n\nTO NEXT POS IN ROUTE\n\n";
 			//getting new position in current route to stack
 				tuple<int,int> nextPos=nextRoute.front();
 				bool check=false;
@@ -423,7 +424,7 @@ class Brain {
 				tie (x2d, y2d) = nextPos;
 				x2=x2d*1.002;
 				y2=y2d*1.002;
-				std::cout<<"CURRENT bigLC: x1= "<<x1<<" y1= "<<y1<<" bigNEXTPOS: x2= "<<x2<<" y2= "<<y2<<std::endl;
+				//std::cout<<"CURRENT bigLC: x1= "<<x1<<" y1= "<<y1<<" bigNEXTPOS: x2= "<<x2<<" y2= "<<y2<<std::endl;
 
 				//moving on small grid to next big grid
 				Grid::Location goal;
@@ -467,8 +468,8 @@ class Brain {
 				int xprecise=xprecised*10.001;
 				int yprecise=yprecised*10.001;
 				start= std::make_tuple(xprecise, yprecise);
-				std::cout<<"smallstart= "<<xprecise<<" "<<yprecise<<"\t";
-				std::cout<<"smallgoal= "<<x_x<<" "<<y_y<<std::endl;
+				//std::cout<<"smallstart= "<<xprecise<<" "<<yprecise<<"\t";
+				//std::cout<<"smallgoal= "<<x_x<<" "<<y_y<<std::endl;
 				if (start==goal) {
 					//just ignore, this is bad practice but I give
 				} else {
@@ -571,7 +572,7 @@ class Brain {
 				double xC;
 				double yC;
 				tie (xC, yC)=infop.robot.getLocation();
-				std::cout<<"currentBigPos= "<<xC<<" "<<yC<<"\n";
+				//std::cout<<"currentBigPos= "<<xC<<" "<<yC<<"\n";
 				}
 	
 				nextRoute.erase(nextRoute.begin());
@@ -588,6 +589,7 @@ class Brain {
 		
 		//for testing
 		void print() {
+		
 			int a;
 			int b;
 			int c;
@@ -643,66 +645,53 @@ int main() {
    		std::cout<<"done reading"<<std::endl;
 		file.close();
 		
-		//manually plot basic route, doesn't work for protruding maps
+		//run A*
+		Grid::Location locs[10][10];
 		Grid::Location start= map.getStart();
-		int x;
-	   	int y;
-	   	tie(x,y)=start;
+		int pm[10][10]={0};
+
+		for (int m=0; m<10; m++) {
+	  	for (int n=0; n<10; n++) {
+	    	locs[m][n] = make_tuple(m,n);
+	    	if (map.lookForObstacles(m,n)!='\0') {
+	    		pm[m][n] = 100;
+	    	} else {pm[m][n]=0;}
+	 		}
+		}	
+
+		Grid grid (locs);
 		for (int m=0; m<10; m++) {
 	  	for (int n=0; n<10; n++) {
 	    	
 	   		if (map.lookForStacks(m,n).getPosX()!=-1) {
-	   		int p;
-	   		vector<tuple<int,int>> oneRoute;
-	   		tuple<int, int> toPush;
-	   		std::cout<< "start x= "<<x<<"\ty= "<<y<<"\t";
-	    	std::cout<< "goal x= "<<m<<"\ty= "<<n<<"\t";
-
-	    		if (x<m) {
-					for (p=0;p<(m-x);) {
-						++p;
-						toPush=std::make_tuple(x+p, y);
-						std::cout<<(x+p)<<"and "<<y<<"\t";
-						oneRoute.push_back(toPush);
-					}
-				} else if (x>m) {
-					for (p=0;p<(x-m);) {
-						++p;
-						toPush=std::make_tuple(x-p, y);
-						std::cout<<x-p<<"and "<<y<<"\t";
-						oneRoute.push_back(toPush);
-					}
-				}
-				x=m;
-				
-				if (y<n) {
-					for (p=0;p<(n-y);) {
-						++p;
-						toPush=std::make_tuple(x, y+p);
-						std::cout<<x<<"and "<<y+p<<"\t";
-						oneRoute.push_back(toPush);
-					}
-				} else if (y>n) {
-					for (p=0;p<(y-n);) {
-						++p;
-						toPush=std::make_tuple(x, y-p);
-						std::cout<<x<<"and "<<y-p<<"\t";
-						oneRoute.push_back(toPush);
-					}
-				}
-
-				y=n;
-				std::cout<<"\n";
-				brain.route.push_back(oneRoute);
+	   		int x;
+	   		int y;
+	   		tie(x,y)=start;
+	   		std::cout<< "start x= "<<x<<"\ty= "<<y<<"\n";
+	    		Grid::Location goal= std::make_tuple(m,n);
+	    		std::cout<< "goal x= "<<m<<"\ty= "<<n<<"\n";
+				brain.route.push_back(a_star_search(grid, start, goal, pm));
+				start=goal;
 	    	} 
 	    	
 	 		}
 		}	
 		
-		/**int xx;
-		int yy;
-		tie (xx,yy)=brain.route.front().front();
-		std::cout<<"startpos= "<<xx<<" "<<yy<<std::endl;*/
+		for (auto &nextRoute: brain.route) {
+		for (auto &pos:nextRoute) {
+			int x;
+			int y;
+			tie (x,y) = pos;
+			std::cout<<"x= "<<x<<" y= "<<y<<"\n";
+		}
+		}
+		
+		for (int pp=0; pp<10; pp++) {
+		for (int qq=0; qq<10; qq++) {
+			std::cout<<" "<<map.gridLink[pp][qq].startx<<map.gridLink[pp][qq].starty;
+		}
+		std::cout<<"\n";
+		}
 		
 	
 	//make thread 
