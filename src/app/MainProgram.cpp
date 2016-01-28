@@ -4,6 +4,7 @@
 #include <iostream>
 #include "../maprelated/FileMapMaker.h"
 #include "StackGet.h"
+#include "../HAL.h"
 
 using std::tuple;
 using std::vector;
@@ -18,7 +19,7 @@ struct Array {
 };
 
 class threadWatcher {
-	//time
+	//timer
 };
 
 class Robot {
@@ -36,38 +37,66 @@ public:
 		//std::cout<<"start x= "<<xlocation<<" start y= "<<ylocation<<std::endl;
 	};
 	
-	//can walk off grid rn
 	void moveU () {
+		int turn=360-directionFacing;
+		turn%=360;
+		changeDirectionFacing(turn);
+		double turnd=turn;
+		void turn(turnd);
+		void move_forward(1);
 		ylocation+=0.1;
 		//std::cout<<"new y= "<<ylocation<<std::endl;
 	}
 	
 	void moveL () {
+		int turn=360-directionFacing;
+		turn%=360;
+		changeDirectionFacing(turn);
+		double turnd=turn;
+		void turn(turnd);
+		void move_forward(1);
 		xlocation-=0.1;
 		//std::cout<<"new x= "<<xlocation<<std::endl;
 	}
 	
 	void moveR () {
+		int turn=360-directionFacing;
+		turn%=360;
+		changeDirectionFacing(turn);
+		double turnd=turn;
+		void turn(turnd);
+		void move_forward(1);
 		xlocation+=0.1;
 		//std::cout<<"new x= "<<xlocation<<std::endl;
 	}
 	
 	void moveD () {
+		int turn=360-directionFacing;
+		turn%=360;
+		changeDirectionFacing(turn);
+		double turnd=turn;
+		void turn(turnd);
+		void move_forward(1);
 		ylocation-=0.1;
 		//std::cout<<"new y= "<<ylocation<<std::endl;
 	}
 	
-	//stack is supposed to be 5x5 on 100x100 grid
 	char lookWithCamera(string str) {
-		int x=xlocation+0.5;
-		int y=ylocation+0.5;
+		int x, y;
+		while (xlocation>10) {
+			xlocation-=10;
+			++x;
+		}
+		while (ylocation>10) {
+			ylocation-=10;
+			++y;
+		}
 		if (str=="top") {char color=mapForTesting.lookForStacks(x, y).getTopBlock();}
 		else if (str=="mid") {char color=mapForTesting.lookForStacks(x, y).getMidBlock();}
 		else if (str=="bot") {char color=mapForTesting.lookForStacks(x, y).getBotBlock();}
 		else {std::cout<<"wrong look at camera"<<std::endl;}
 	}
 	
-	//combine this with move later
 	int getDirectionFacing() {
 		return directionFacing;
 	}
