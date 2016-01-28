@@ -1,8 +1,8 @@
 #include <pthread.h>
 #include <stdio.h>
-#include "Astar.h"
+#include "../maprelated/Astar.h"
 #include <iostream>
-#include "FileMapMaker.h"
+#include "../maprelated/FileMapMaker.h"
 #include "StackGet.h"
 
 using std::tuple;
