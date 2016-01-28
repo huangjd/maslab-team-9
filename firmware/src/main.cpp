@@ -6,10 +6,8 @@
 #include "Config.h"
 #include "MessageBuffer.h"
 
-#define FIRMWARE_DEBUG 1
-
 static void dit() {
-#ifdef FIRMWARE_DEBUG
+#ifndef NDEBUG
   pinMode(13, OUTPUT);
   digitalWrite(13, 1);
   delay(100);
@@ -19,7 +17,7 @@ static void dit() {
 }
 
 static void dat() {
-#ifdef FIRMWARE_DEBUG
+#ifndef NDEBUG
   pinMode(13, OUTPUT);
   digitalWrite(13, 1);
   delay(500);
@@ -29,7 +27,7 @@ static void dat() {
 }
 
 static void gap() {
-#ifdef FIRMWARE_DEBUG
+#ifndef NDEBUG
   delay(200);
 #endif
 }
@@ -60,6 +58,24 @@ void setup() {
   }
 
   dat();
+
+  for (int i : {WHEEL_DIR_L, WHEEL_DIR_R, WHEEL_SPEED_L, WHEEL_SPEED_R,
+                STEPPER_L_EN, STEPPER_L_CLK, STEPPER_L_DIR,
+                STEPPER_R_EN, STEPPER_R_CLK, STEPPER_R_DIR,
+                CLAMP_L, CLAMP_R,
+                CONTAINER_L_1, CONTAINER_L_2, CONTAINER_R_1, CONTAINER_R_2}) {
+    pinMode(i, OUTPUT);
+    digitalWrite(i, 0);
+  }
+
+  for (int i : {ULTRA_SHORT_IR_L, ULTRA_SHORT_IR_B, ULTRA_SHORT_IR_R, ULTRA_SHORT_IR_F,
+                SHORT_IR_L, SHORT_IR_B, SHORT_IR_R, SHORT_IR_F,
+                ENCODER_L_A, ENCODER_L_B, ENCODER_R_A, ENCODER_R_B}) {
+    pinMode(i, INPUT);
+  }
+
+  analogWrite(CLAMP_L, CLAMP_CLOSE_PWM);
+  analogWrite(CLAMP_R, CLAMP_CLOSE_PWM);
 
   //debugPrint("Module Init OK\n");
 }

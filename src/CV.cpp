@@ -1,5 +1,7 @@
 #include "CV.h"
 
+#define SHOW_COUT
+
 #include <vector>
 #include <iostream>
 
@@ -47,10 +49,10 @@ void ColorThresholding(const cv::Mat& src, int thresVal, cv::Mat& thresOut_r, cv
     erode(bin_r, bin_r, Mat());
     dilate(bin_r, bin_r, Mat());
 
-
+#ifndef NDEBUG
     imshow("Red Binary", bin_r);
     imshow("Green Binary", bin_g);
-
+#endif
 }
 
 void CubeContours(const cv::Mat& src, const cv::Mat& src_binary_r, const cv::Mat& src_binary_g, cv::Mat& src_contour, std::vector<cv::Point2f> &blockCenter_r, std::vector<cv::Point2f> &blockCenter_g) {
@@ -254,7 +256,7 @@ void StackContours(const cv::Mat& src, const cv::Mat& src_binary_r, const cv::Ma
 }
 
 Camera::Camera() : resX(640), resY(480), cap(0), thresCanny(130), cubeNotFound(0), stackNotFound(0) {
-  cap.open(true);
+  cap.open(0);
   if (!cap.isOpened()) {
     cout << "Cannot open the web cam" << endl;
     throw exception();
@@ -311,7 +313,7 @@ void Camera::moveTowardsCube() {
             {
                 move_forward(1);
             }
-#ifndef NDEBUG
+#ifdef SHOW_COUT
             cout << "r: " << target.x << ", " << target.y;
 #endif
         }
@@ -340,14 +342,14 @@ void Camera::moveTowardsCube() {
             {
                 move_forward(1);
             }
-#ifndef NDEBUG
+#ifdef SHOW_COUT
             cout << "g: " << target.x << ", " << target.y;
 #endif
         }
         else
         {
             cubeNotFound++;
-#ifndef NDEBUG
+#ifdef SHOW_COUT
             cout << cubeNotFound << endl;
 #endif
             ///If no cube present (accounting for noise)
@@ -394,14 +396,14 @@ void Camera::moveTowardsStack() {
             {
                 move_forward(1);
             }
-#ifndef NDEBUG
+#ifdef SHOW_COUT
             cout << block.x << ", " << block.y;
 #endif
         }
         else
         {
             stackNotFound++;
-#ifndef NDEBUG
+#ifdef SHOW_COUT
             cout << stackNotFound << endl;
 #endif
             ///If no cube stack present (accounting for noise)

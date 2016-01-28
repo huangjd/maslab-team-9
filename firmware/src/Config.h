@@ -51,7 +51,7 @@
 #define CONTAINER_R_2     16
 #define STEPPER_L_CLK     15
 #define STEPPER_L_DIR     14
-#define GYRO_ACK          13
+#define GYRO_SCK          13
 #define STEPPER_L_EN      33
 #define STEPPER_R_CLK     32
 #define STEPPER_R_DIR     31
@@ -83,8 +83,8 @@
 #define DOOR_MOTOR_SCALE   10
 #define DOOR_MOTOR_CONSATANT 10
 
-#define CLAMP_CLOSE_PWM    120
-#define CLAMP_OPEN_PWM     130
+#define CLAMP_CLOSE_PWM    220
+#define CLAMP_OPEN_PWM     170
 
 #define EMERGENCY_BACKUP_AMOUNT 200
 

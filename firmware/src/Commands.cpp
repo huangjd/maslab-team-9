@@ -27,7 +27,6 @@ static bool blink() {
 
 static bool echo() {
   strncpy(txbuf.buffer, rxbuf + 1, RX_MAX - 1);
-
   return true;
 }
 
@@ -37,7 +36,6 @@ static bool readAnalog() {
     pinMode(pin, INPUT);
     int val = analogRead(pin);
     sprintf(txbuf.buffer, "%d", val);
-
     return true;
   } else {
     return false;
@@ -95,8 +93,8 @@ static bool halt() {
 }
 
 static bool moveForward() {
-  float val;
-  if (sscanf(rxbuf, "%f", &val)) {
+  int val;
+  if (sscanf(rxbuf, "%d", &val)) {
     if (val > 0) {
       digitalWrite(WHEEL_DIR_L, 1);
       digitalWrite(WHEEL_DIR_R, 0);
@@ -106,7 +104,7 @@ static bool moveForward() {
     }
     analogWrite(WHEEL_SPEED_L, 255);
     analogWrite(WHEEL_SPEED_R, 255);
-    delay(fabs(val) * FORWARD_CONSTANT);
+    delay(abs(val) * FORWARD_CONSTANT);
     analogWrite(WHEEL_SPEED_L, 0);
     analogWrite(WHEEL_SPEED_R, 0);
     return true;
@@ -118,15 +116,15 @@ static bool turn() {
   float val;
   if (sscanf(rxbuf, "%f", &val)) {
     if (val > 0) {
-      digitalWrite(WHEEL_DIR_L, 0);
-      digitalWrite(WHEEL_DIR_R, 0);
-    } else {
       digitalWrite(WHEEL_DIR_L, 1);
       digitalWrite(WHEEL_DIR_R, 1);
+    } else {
+      digitalWrite(WHEEL_DIR_L, 0);
+      digitalWrite(WHEEL_DIR_R, 0);
     }
     analogWrite(WHEEL_SPEED_L, 255);
     analogWrite(WHEEL_SPEED_R, 255);
-    delay(fabs(val) * TURN_CONSTANT);
+    delay(abs(val) * TURN_CONSTANT);
     analogWrite(WHEEL_SPEED_L, 0);
     analogWrite(WHEEL_SPEED_R, 0);
     return true;
@@ -136,8 +134,9 @@ static bool turn() {
 
 static bool step() {
   unsigned int mode;
-  if (sscanf(rxbuf, "%u", &mode) && mode < 4) {
-    stepperOperation(mode, 1);
+  unsigned int n = 1;
+  if (sscanf(rxbuf, "%u %u", &mode, &n) && mode < 4) {
+    stepperOperation(mode, n);
     return true;
   }
   return false;
@@ -207,7 +206,7 @@ static bool readIR() {
       sprintf(txbuf.buffer, "%d %d", analogRead(SHORT_IR_F), digitalRead(ULTRA_SHORT_IR_F));
       break;
     }
-
+    return true;
   }
   return false;
 }
@@ -245,12 +244,16 @@ static bool release() {
   return false;
 }
 
+static bool endGame() {
+  return true;
+}
+
 static bool readIRDist() {
   return false;
 }
 
 bool (*commandsRegister[64])() = {
-    badcmd, writeAnalog, badcmd, badcmd, writeDigital, badcmd, badcmd, badcmd, // @ABCDEFG
+    badcmd, writeAnalog, badcmd, badcmd, writeDigital, endGame, badcmd, badcmd, // @ABCDEFG
     halt, readIRDist, badcmd, badcmd, badcmd, moveForward, badcmd, badcmd, // HIJKLMNO
     pickup, badcmd, release, badcmd, turn, badcmd, badcmd, badcmd, // PQRSTUVW
     badcmd, badcmd, badcmd, badcmd, badcmd, badcmd, badcmd, badcmd, // XYZ[\]^_

@@ -50,13 +50,17 @@ void stepperOperation(unsigned int mode, int steps) {
   unsigned int en = (right ? STEPPER_R_EN : STEPPER_L_EN);
   unsigned int dir = (right ? STEPPER_R_DIR : STEPPER_L_DIR);
 
+  pinMode(en, OUTPUT);
+  pinMode(clk, OUTPUT);
+  pinMode(dir, OUTPUT);
+
   digitalWrite(en, 1);
 
   digitalWrite(dir, (bool)(mode & DOWN));
-
+  delay(STEPPER_DELAY * 2);
   int n = (mode & STEPPER_TWICE ? 2 * steps : steps);
   for (int i = 0; i < n; i++) {
-    clock(clk, 0, STEPPER_DELAY);
+    clock(clk, STEPPER_DELAY, STEPPER_DELAY);
   }
 
   digitalWrite(en, 0);
