@@ -309,7 +309,7 @@ bool Forward() {
       digitalWrite(WHEEL_DIR_L, 1);
       digitalWrite(WHEEL_DIR_R, 0);
     }
-    speed = abs(speed);
+    amount = abs(amount);
     analogWrite(WHEEL_SPEED_L, speed);
     analogWrite(WHEEL_SPEED_R, speed);
     delay(amount);
