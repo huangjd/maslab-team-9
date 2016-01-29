@@ -75,3 +75,7 @@ void charge() {
 void halt() {
   usbProxy.sendCmd("H");
 }
+
+void randomMovement() {
+  usbProxy.sendCmd("X");
+}

@@ -30,4 +30,6 @@ void charge();
 
 void move_forward_custom_speed(int x, int power = 64);
 
+void randomMovement();
+
 #endif // __HAL_H__

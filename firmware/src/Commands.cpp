@@ -3,6 +3,8 @@
 #include "WProgram.h"
 #include "Common.h"
 #include "Operation.h"
+#include <cmath>
+
 
 #include "Servo.h"
 
@@ -247,9 +249,11 @@ static bool endGame() {
   extern bool StackRed;
   if (StackRed) {
     stepperOperation(RIGHT, DOWN, STEPPER_STEP_1 + STEPPER_STEP_2);
+    delay(500);
     clampOperation(RIGHT, CLAMP_OPEN_R);
   } else {
     stepperOperation(LEFT, DOWN, STEPPER_STEP_1 + STEPPER_STEP_2);
+    delay(500);
     clampOperation(LEFT, CLAMP_OPEN_R);
   }
   halt();
@@ -327,11 +331,37 @@ bool Init() {
   return true;
 }
 
+bool randomMovement() {
+  int t = rand() % 180;
+  if (rand() % 2) {
+    digitalWrite(WHEEL_DIR_L, 0);
+    digitalWrite(WHEEL_DIR_R, 0);
+  } else {
+    digitalWrite(WHEEL_DIR_L, 1);
+    digitalWrite(WHEEL_DIR_R, 1);
+  }
+  analogWrite(WHEEL_SPEED_L, MOTOR_SPEED);
+  analogWrite(WHEEL_SPEED_R, MOTOR_SPEED);
+  delay(t * TURN_CONSTANT);
+  analogWrite(WHEEL_SPEED_L, 0);
+  analogWrite(WHEEL_SPEED_R, 0);
+
+  digitalWrite(WHEEL_DIR_L, 0);
+  digitalWrite(WHEEL_DIR_R, 1);
+
+  analogWrite(WHEEL_SPEED_L, MOTOR_SPEED);
+  analogWrite(WHEEL_SPEED_R, MOTOR_SPEED);
+  delay((rand() % 10) * 18 * FORWARD_CONSTANT);
+  analogWrite(WHEEL_SPEED_L, 0);
+  analogWrite(WHEEL_SPEED_R, 0);
+  return true;
+}
+
 bool (*commandsRegister[64])() = {
     Init, writeAnalog, badcmd, ClampHL, writeDigital, endGame, Forward, setStackRed, // @ABCDEFG
     Halt, readIRDist, badcmd, KnockStack, badcmd, moveForward, badcmd, badcmd, // HIJKLMNO
     pickup, badcmd, release, badcmd, turn, badcmd, badcmd, badcmd, // PQRSTUVW
-    badcmd, badcmd, badcmd, badcmd, badcmd, badcmd, badcmd, badcmd, // XYZ[\]^_
+    randomMovement, badcmd, badcmd, badcmd, badcmd, badcmd, badcmd, badcmd, // XYZ[\]^_
     badcmd, readAnalog, blink, badcmd, readDigital, echo,  badcmd, badcmd, // `abcdefg
     badcmd, readIR, badcmd, badcmd, badcmd, badcmd, badcmd, badcmd, // hijklmno
     badcmd, badcmd, badcmd, step, badcmd, badcmd, badcmd, badcmd, // pqrstuvw
