@@ -1,10 +1,10 @@
 #include <pthread.h>
 #include <stdio.h>
-#include "Astar.h"
+#include "../Astar.h"
 #include <iostream>
-#include "FileMapMaker.h"
-#include "StackGet.h"
-#include "HAL.h"
+#include "../FileMapMaker.h"
+#include "../StackGet.h"
+#include "../HAL.h"
 #include <cstdio>
 #include  <ctime>
 using std::tuple;
