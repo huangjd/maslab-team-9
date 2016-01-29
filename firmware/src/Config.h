@@ -92,7 +92,7 @@
 #define CLAMP_CLOSE_R           165
 #define CLAMP_OPEN_R            135
 
-#define EMERGENCY_BACKUP_AMOUNT 150
+#define EMERGENCY_BACKUP_AMOUNT 300
 
 #endif // __CONFIG_H__
 

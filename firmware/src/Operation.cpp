@@ -72,8 +72,8 @@ void stepperOperation(bool right, bool down, int steps) {
 }
 
 void emergencyBackUp() {
-  digitalWrite(WHEEL_DIR_L, 0);
-  digitalWrite(WHEEL_DIR_R, 1);
+  digitalWrite(WHEEL_DIR_L, 1);
+  digitalWrite(WHEEL_DIR_R, 0);
   analogWrite(WHEEL_SPEED_L, 255);
   analogWrite(WHEEL_SPEED_R, 255);
   delay(EMERGENCY_BACKUP_AMOUNT);
