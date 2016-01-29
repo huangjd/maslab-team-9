@@ -10,9 +10,9 @@ int main()
   while (true) {
     //cam.moveTowardsStack();
     cam.moveTowardsCube();
-    if((cam.cubeFound == 3)||(cam.cubeNotFound >= 1000)  //If stack is found
+    if((cam.cubeFound == 3)||(cam.cubeNotFound >= 1000))  //If stack is found
     {
-        exit();
+        exit(0);
     }
   }
   return 0;

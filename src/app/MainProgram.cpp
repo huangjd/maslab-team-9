@@ -207,7 +207,7 @@ class Brain {
 			//break blocks
 			//get cube
 			//update count
-			getStack());
+			getStack();
 		
 		}
 		

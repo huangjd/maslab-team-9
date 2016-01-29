@@ -281,9 +281,9 @@ void Camera::moveTowardsCube() {
 	ColorThresholding(image, 130, src_bin_r, src_bin_g);
 	CubeContours(image, src_bin_r, src_bin_g, imageDrawn, blockCenter_r, blockCenter_g);
 
-//#ifndef NDEBUG
+	#ifndef NDEBUG
       	imshow("Camera Feed", imageDrawn);   //Display camera
-//#endif
+	#endif
 
 	///Actions to do if cube is found
         //Red cube has priority; first detected cube will be picked up
@@ -297,12 +297,13 @@ void Camera::moveTowardsCube() {
             Point2f target = blockCenter_r[0];
 
             ///Fix the decimal values
-            if((target.x > (resX - 0.25*resX))&&(target.y > 0.1*resY)&&(target.y <  0.25*resY)) //If cube is in corner
+            if((target.x > (resX - 0.20*resX))&&(target.y > 0.1*resY)&&(target.y <  0.20*resY)) //If cube is in corner
             {
-                move_forward(1);
+                move_forward(2);
                 cubeFound++;
-                waitKey(1000);
-                move_forward(-2);
+		waitKey(1000);
+		pickup(true);
+                move_forward(-1);
                 waitKey(500);
             }
             else if(target.y < 0.1*resY) //If cube is too far right
@@ -319,7 +320,7 @@ void Camera::moveTowardsCube() {
                 waitKey(500);
             }
 #ifdef SHOW_COUT
-            cout << "r: " << target.x << ", " << target.y;
+            cout << "r: " << target.x << ", " << target.y << endl;
 #endif
         }
         ///If Green Cube is present and not red
@@ -331,12 +332,13 @@ void Camera::moveTowardsCube() {
             Point2f target = blockCenter_g[0];
 
 
-            if((target.x > (resX - 0.25*resX))&&(target.y > (resY - 0.25*resY))&&(target.y < (resY - 0.1*resY))) //If cube is in corner
+            if((target.x > (resX - 0.20*resX))&&(target.y > (resY - 0.20*resY))&&(target.y < (resY - 0.1*resY))) //If cube is in corner
             {
-                move_forward(1);
+                move_forward(2);
                 cubeFound++;
-                waitKey(1000);
-                move_forward(-2);
+		waitKey(1000);
+		pickup(false);
+                move_forward(-1);
                 waitKey(500);
             }
             else if(target.y < (resY - 0.25*resY)) //If cube is too far right
@@ -353,7 +355,7 @@ void Camera::moveTowardsCube() {
                 waitKey(500);
             }
 #ifdef SHOW_COUT
-            cout << "g: " << target.x << ", " << target.y;
+            cout << "g: " << target.x << ", " << target.y << endl;
 #endif
         }
         else
