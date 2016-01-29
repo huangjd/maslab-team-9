@@ -7,16 +7,20 @@
 using namespace std;
 
 int main() {
+  string mode;
+  int duration;
   while (true) {
-    string mode;
-    int duration;
     cout << "Input Direction: " << endl;
     getline(cin, mode);
     cout << "Input Duration: " << endl;
     cin >> duration;
+    
     if(mode == "F")
         move_forward(duration);
     else if(mode == "T")
         turn(duration);
+
+    cin.clear();
+    cin.ignore();
   }
 }

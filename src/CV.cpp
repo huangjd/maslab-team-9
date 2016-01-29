@@ -50,8 +50,8 @@ void ColorThresholding(const cv::Mat& src, int thresVal, cv::Mat& thresOut_r, cv
     dilate(bin_r, bin_r, Mat());
 
 #ifndef NDEBUG
-    imshow("Red Binary", bin_r);
-    imshow("Green Binary", bin_g);
+    //    imshow("Red Binary", bin_r);
+    //    imshow("Green Binary", bin_g);
 #endif
 }
 
@@ -255,7 +255,7 @@ void StackContours(const cv::Mat& src, const cv::Mat& src_binary_r, const cv::Ma
 
 }
 
-Camera::Camera() : resX(640), resY(480), cap(0), thresCanny(130), cubeNotFound(0), stackNotFound(0) {
+Camera::Camera() : resX(320), resY(240), cap(0), thresCanny(130), cubeNotFound(0), stackNotFound(-50) {
   cap.open(0);
   if (!cap.isOpened()) {
     cout << "Cannot open the web cam" << endl;
@@ -282,7 +282,7 @@ void Camera::moveTowardsCube() {
 	CubeContours(image, src_bin_r, src_bin_g, imageDrawn, blockCenter_r, blockCenter_g);
 
 #ifndef NDEBUG
-	imshow("Camera Feed", imageDrawn);   //Display camera
+      	imshow("Camera Feed", imageDrawn);   //Display camera
 #endif
 
 	///Actions to do if cube is found
@@ -299,20 +299,20 @@ void Camera::moveTowardsCube() {
             ///Fix the decimal values
             if((target.x > (resX - 0.25*resX))&&(target.y > 0.1*resY)&&(target.y <  0.25*resY)) //If cube is in corner
             {
-                move_to(0, 5);
+                move_forward(1);
                 cubeFound++;
             }
             else if(target.y < 0.1*resY) //If cube is too far right
             {
-                turn(5);
+                turn(1);
             }
             else if(target.y > 0.25*resY) //If cube is too far left
             {
-                turn(-5);
+                turn(-1);
             }
             else if(target.x < (resX - 0.25*resX)) //If cube is too far forward
             {
-                move_to(0, 1);
+                move_forward(1);
             }
 #ifdef SHOW_COUT
             cout << "r: " << target.x << ", " << target.y;
@@ -329,20 +329,20 @@ void Camera::moveTowardsCube() {
 
             if((target.x > (resX - 0.25*resX))&&(target.y > (resY - 0.25*resY))&&(target.y < (resY - 0.1*resY))) //If cube is in corner
             {
-                move_to(0, 5);
+                move_forward(1);
                 cubeFound++;
             }
             else if(target.y < (resY - 0.25*resY)) //If cube is too far right
             {
-                turn(5);
+                turn(1);
             }
             else if(target.y > (resY - 0.1*resY)) //If cube is too far left
             {
-                turn(-5);
+                turn(-1);
             }
             else if(target.x < (resX - 0.25*resX)) //If cube is too far forward
             {
-                move_to(0, 1);
+                move_forward(1);
             }
 #ifdef SHOW_COUT
             cout << "g: " << target.x << ", " << target.y;
@@ -357,11 +357,11 @@ void Camera::moveTowardsCube() {
             ///If no cube present (accounting for noise)
             if(stackNotFound == 20)
             {
-                move_to(0, -5); //Move back
+                move_forward(-1);
             }
             else if(stackNotFound > 20)
             {
-                turn(5); //Turn
+                turn(-1); //Turn
             }
         }
 }
@@ -377,9 +377,9 @@ void Camera::moveTowardsStack() {
 
         ColorThresholding(image, thresCanny, src_bin_r, src_bin_g);
         StackContours(image, src_bin_r, src_bin_g, imageDrawn, block);
-#ifndef NDEBUG
+	//#ifndef NDEBUG
         imshow("Camera Feed", imageDrawn);   //Display camera
-#endif
+	//#endif
         ///Actions to do if cube stack is found
 
         if((block.x != 0)&&(block.y != 0))
@@ -388,23 +388,26 @@ void Camera::moveTowardsStack() {
             ///Fix the decimal values
             if((block.x > (resX - 0.1*resX))&&(block.y > 0.4*resY)&&(block.y < 0.6*resY)) //If cube is in corner
             {
-                move_to(0, 5);
+	      move_forward(1);
                 stackFound = 1;
             }
             else if(block.y < 0.4*resY) //If cube is too far right
             {
-                turn(5);
+                turn(1);
             }
             else if(block.y > 0.6*resY) //If cube is too far left
             {
-                turn(-5);
+                turn(-1);
             }
             else if(block.x < (resX - 0.1*resX)) //If cube is too far forward
             {
-                move_to(0, 1);
+	        move_forward(0);
+		waitKey(1000);
+                move_forward(1);
+		waitKey(1000);
             }
 #ifdef SHOW_COUT
-            cout << block.x << ", " << block.y;
+            cout << block.x << ", " << block.y << endl;
 #endif
         }
         else
@@ -414,13 +417,13 @@ void Camera::moveTowardsStack() {
             cout << stackNotFound << endl;
 #endif
             ///If no cube stack present (accounting for noise)
-            if(stackNotFound == 20)
+            if(stackNotFound == 50)
             {
-                move_to(0, -5); //Move back
+                move_forward(-1); //Move back
             }
             else if(stackNotFound > 20)
             {
-                turn(5); //Turn
+                turn(-1); //Turn
             }
         }
 
