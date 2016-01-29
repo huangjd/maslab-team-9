@@ -10,6 +10,11 @@
 
 Servo leftServo, rightServo;
 
+IntervalTimer goodbye;
+static int life = 178 * 1000 * 1000;
+
+extern void halt();
+
 static void dit() {
 #ifndef NDEBUG
   pinMode(13, OUTPUT);
@@ -88,6 +93,8 @@ void setup() {
   stepperOperation(LEFT, UP, STEPPER_STEP_1 + STEPPER_STEP_2);
   stepperOperation(RIGHT, UP, STEPPER_STEP_1 + STEPPER_STEP_2);
 
+  goodbye.begin(halt, life);
+
   //debugPrint("Module Init OK\n");
 }
 
@@ -119,7 +126,6 @@ bool StackRed = false;
 
 bool alive = true;
 
-extern void halt();
 int main() {
   setup();
   while(alive) {
