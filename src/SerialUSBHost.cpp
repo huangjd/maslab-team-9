@@ -5,6 +5,7 @@
 #include <cstdio>
 #include <cstring>
 #include <string>
+#include <iostream>
 
 #include <fcntl.h>
 #include <termios.h>
@@ -262,9 +263,15 @@ void* USBProxy2::USBProxyRoutine(void *arg) {
       self->host.sendCmd(cmd.cmd);
       if (cmd.writeBack) {
         self->host.recvCmd(*cmd.writeBack);
+#ifndef NDEBUG
+        cout << "Response received for command " << cmd.cmd << " : " <<  (*cmd.writeBack) << endl;
+#endif
       } else {
         string temp;
         self->host.recvCmd(temp);
+#ifndef NDEBUG
+        cout << "Response received for command " << cmd.cmd << " : " << temp << endl;
+#endif
       }
       if (cmd.ok) {
         *cmd.ok = true;
@@ -304,6 +311,9 @@ void USBProxy2::sendCmd(const string &s, volatile bool *ok) {
   lock.lock();
   cmdQueue.push_back({s, ok, nullptr});
   lock.unlock();
+#ifndef NDEBUG
+  cout << "Command sent: " << s << endl;
+#endif
 }
 
 void USBProxy2::sendCmd(const string &s, volatile bool *ok, string &response) {
@@ -311,6 +321,9 @@ void USBProxy2::sendCmd(const string &s, volatile bool *ok, string &response) {
   lock.lock();
   cmdQueue.push_back({s, ok, &response});
   lock.unlock();
+#ifndef NDEBUG
+  cout << "Command sent: " << s << endl;
+#endif
 }
 
 string USBProxy2::sendCmdBlocked(const string &s) {
