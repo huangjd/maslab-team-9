@@ -299,7 +299,7 @@ void Camera::moveTowardsCube() {
             Point2f target = blockCenter_r[0];
 
             ///Fix the decimal values
-            if((target.x > (resX - 0.15*resX))&&(target.y > 0.1*resY)&&(target.y <  0.25*resY)) //If cube is in corner
+            if((target.x > (resX - 0.2*resX))&&(target.y > 0.1*resY)&&(target.y <  0.25*resY)) //If cube is in corner
             {
                 move_forward(2);
                 cubeFound++;
@@ -319,7 +319,7 @@ void Camera::moveTowardsCube() {
             {
                 turn(-1);
             }
-            else if(target.x < (resX - 0.15*resX)) //If cube is too far forward
+            else if(target.x < (resX - 0.2*resX)) //If cube is too far forward
             {
                 move_forward(1);
                 waitKey(500);
@@ -337,7 +337,7 @@ void Camera::moveTowardsCube() {
             Point2f target = blockCenter_g[0];
 
 
-            if((target.x > (resX - 0.15*resX))&&(target.y > (resY - 0.20*resY))&&(target.y < (resY - 0.1*resY))) //If cube is in corner
+            if((target.x > (resX - 0.2*resX))&&(target.y > (resY - 0.2*resY))&&(target.y < (resY - 0.1*resY))) //If cube is in corner
             {
                 move_forward(2);
                 cubeFound++;
@@ -357,7 +357,7 @@ void Camera::moveTowardsCube() {
             {
                 turn(-1);
             }
-            else if(target.x < (resX - 0.15*resX)) //If cube is too far forward
+            else if(target.x < (resX - 0.2*resX)) //If cube is too far forward
             {
                 move_forward(1);
                 waitKey(500);
@@ -372,15 +372,18 @@ void Camera::moveTowardsCube() {
 #ifdef SHOW_COUT
             cout << cubeNotFound << endl;
 #endif
+	    if(cubeNotFound % 5)
+	      {
             ///If no cube present (accounting for noise)
-            if(cubeNotFound >= 200)
+            if(cubeNotFound >= 200) 
             {
-                turn(-1);
+                turn(1);
             }
             else if(cubeNotFound > 20)
             {
                 turn(-1); //Turn
             }
+	      }
         }
 }
 
