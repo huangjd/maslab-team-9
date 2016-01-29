@@ -4,10 +4,15 @@
 #include <iostream>
 #include <time.h>
 #include "../HAL.h"
+#include <sys/resource.h>
 using namespace std;
 
-int main(){
+int main(int argc, char ** argv){
+    rlimit lim = {180, 180};
+setrlimit(RLIMIT_CPU, &lim);
+
     Camera cam;
+        cam.gameMode = atoi(argv[1]); // 0 = red; 1 = green
     while (true)
     {
         srand (time(NULL));
@@ -16,7 +21,7 @@ int main(){
         cam.cubeNotFound = 0;
         cam.cubeFound = 0;
 
-        cam.gameMode = 0; // 0 = red; 1 = green
+
 
         while (true)
         {
