@@ -299,17 +299,19 @@ bool KnockStack() {
 }
 
 bool Forward() {
-  int speed;
   int amount;
-  if (sscanf(rxbuf, "%d %d", &amount, &speed) == 2) {
-    if (speed > 0) {
+  int speed;
+  int sign;
+  if (sscanf(rxbuf, "%d %d %d", &amount, &speed, &sign) == 3) {
+    if (sign == 0) {
       digitalWrite(WHEEL_DIR_L, 0);
       digitalWrite(WHEEL_DIR_R, 1);
-    } else {
+    } else if (sign == 1) {
       digitalWrite(WHEEL_DIR_L, 1);
       digitalWrite(WHEEL_DIR_R, 0);
+    } else {
+      return false;
     }
-    amount = abs(amount);
     analogWrite(WHEEL_SPEED_L, speed);
     analogWrite(WHEEL_SPEED_R, speed);
     delay(amount);

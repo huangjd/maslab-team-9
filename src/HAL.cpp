@@ -21,8 +21,13 @@ void move_forward(int x) {
 }
 
 void move_forward_custom_speed(int x, int power) {
-  char s[20];
-  sprintf(s, "F %d %d", x * 18, power);
+  char s[40];
+  int back = 0;
+  if (x < 0) {
+    back = 1;
+    x = abs(x);
+  }
+  sprintf(s, "F %d %d %d", x * 18, power, back);
   usbProxy.sendCmd(s);
 }
 
