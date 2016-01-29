@@ -25,6 +25,7 @@ public:
   int cubeFound;
   int stackNotFound;
   int stackFound;
+  int gameMode;
 
   Camera();
   ~Camera();
