@@ -57,17 +57,16 @@ static int tryOpen(const char* deviceName) {
 
 SerialUSBHost::SerialUSBHost() : device_fd(-1), defaultDevice{"/dev/ttyACM0"} {
   device_fd = tryOpen(defaultDevice);
-  if (device_fd < 0) {
-    for (char c = '1'; c <= '9'; c++) {
+  while (device_fd < 0) {
+    for (char c = '0'; c <= '9'; c++) {
       defaultDevice[11] = c;
       device_fd = tryOpen(defaultDevice);
       if (device_fd >= 0) {
         return;
       }
     }
-
     perror("Unable to find teensy device!");
-    throw exception();
+    usleep(100000);
   }
 }
 
