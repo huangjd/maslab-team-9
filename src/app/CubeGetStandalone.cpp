@@ -8,9 +8,9 @@ int main()
   //Move towards stack
   Camera cam;
   while (true) {
-    cam.moveTowardsStack();
-    //cam.moveTowardsCube();
-    if((cam.stackFound == 1)||(cam.stackNotFound >= 1000)  //If stack is found
+    //cam.moveTowardsStack();
+    cam.moveTowardsCube();
+    if((cam.cubeFound == 3)||(cam.cubeNotFound >= 1000)  //If stack is found
       {
 	exit();
       }
