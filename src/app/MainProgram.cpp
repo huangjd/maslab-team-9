@@ -6,7 +6,9 @@
 #include "../StackGet.h"
 #include "../HAL.h"
 #include <cstdio>
-#include  <ctime>
+#include <ctime>
+#include <cmath>
+
 using std::tuple;
 using std::vector;
 
@@ -72,7 +74,6 @@ public:
 	char lookWithCamera(string str) {
 	}
 	
-	//combine this with move later
 	double getDirectionFacing() {
 		return directionFacing;
 	}
@@ -81,27 +82,40 @@ public:
 		return std::make_tuple(xlocation, ylocation);
 	}
 	
-	vector<tuple<int, int>> getIRDataU() {
-		vector<tuple<int,int>> IRDataU;
-		IRDataU.push_back(std::make_tuple(1, 10));
+	tuple<int, int> getIRDataU() {
+		tuple<int,int> IRDataU;
+		//get IR data from pin
+		//int IRVal;
+		//int distance= log(24.979/IRVal)/log(1.167);
+		//IRData=std::make_tuple(distance, 10);
+		IRDataU=std::make_tuple(1, 10);
 		return IRDataU;
 	}
 	
-	vector<tuple<int, int>> getIRDataL() {
-		vector<tuple<int,int>> IRDataL;
-		IRDataL.push_back(std::make_tuple(1, 10));
+	tuple<int, int> getIRDataL() {
+		tuple<int,int> IRDataL;
+		//int IRVal;
+		//int distance= log(24.979/IRVal)/log(1.167);
+		//IRData=std::make_tuple(distance, 10);
+		IRDataL=std::make_tuple(1, 10);
 		return IRDataL;
 	}
 	
-	vector<tuple<int, int>> getIRDataR() {
-		vector<tuple<int,int>> IRDataR;
-		IRDataR.push_back(std::make_tuple(1, 10));
+	tuple<int, int> getIRDataR() {
+		tuple<int,int> IRDataR;
+		//int IRVal;
+		//int distance= log(24.979/IRVal)/log(1.167);
+		//IRData=std::make_tuple(distance, 10);
+		IRDataR=std::make_tuple(1, 10);
 		return IRDataR;
 	}
 	
-	vector<tuple<int, int>> getIRDataD() {
-		vector<tuple<int,int>> IRDataD;
-		IRDataD.push_back(std::make_tuple(1, 10));
+	tuple<int, int> getIRDataD() {
+		tuple<int,int> IRDataD;
+		//int IRVal;
+		//int distance= log(24.979/IRVal)/log(1.167);
+		//IRData=std::make_tuple(distance, 10);
+		IRDataD=std::make_tuple(1, 10);
 		return IRDataD;
 	}
 	
@@ -117,10 +131,10 @@ struct info {
 	public:
 		string com;
 		Robot robot;
-		vector<tuple<int, int>> IRDataU;
-		vector<tuple<int, int>> IRDataL;
-		vector<tuple<int, int>> IRDataR;
-		vector<tuple<int, int>> IRDataD;
+		tuple<int, int> IRDataU;
+		tuple<int, int> IRDataL;
+		tuple<int, int> IRDataR;
+		tuple<int, int> IRDataD;
 		info(void) {};
 		info(Robot roborto): robot(roborto){};
 		
@@ -131,8 +145,10 @@ struct info {
 };
 
 void *robotDo(void *com) {
+	std::cout<< "reached multithread" << std::endl;
 	struct info *commands= (struct info*)com;
 	string command=commands->com;
+	//std::cout<<"command= "<<command<<std::endl;
 	while (command!="stop") {
 		command=commands->com;
 		pthread_mutex_lock(&mutex);
@@ -142,6 +158,7 @@ void *robotDo(void *com) {
 		commands->IRDataD=commands->robot.getIRDataD();
 		pthread_mutex_unlock(&mutex);
 	}
+	std::cout<<"ending"<<std::endl;
 	return NULL;
 		
 }
@@ -154,10 +171,10 @@ class Brain {
 	vector<tuple<int,int>> stacksToBeVisited;
 	vector<tuple<int,int>> blocksCollected;
 	vector<tuple<int,int>> blocksDiscarded;
-	vector<tuple<int, int>> IRDataU; 
-	vector<tuple<int, int>> IRDataL;
-	vector<tuple<int, int>> IRDataR;
-	vector<tuple<int, int>> IRDataD;
+	tuple<int, int> IRDataU; 
+	tuple<int, int> IRDataL;
+	tuple<int, int> IRDataR;
+	tuple<int, int> IRDataD;
 	int grids[100][100]={{0}};
 	//each time you revisit a position, increase its obstacle prob. value with
 	//diminishing returns
@@ -165,37 +182,24 @@ class Brain {
 	
 	Brain (void) {};
 	
-		//updates the 100x100 grid
 		void updateGrid(info infop) {
 			int x; 
 			int y;
 			tie(x, y)=infop.robot.getLocation();
-			for (tuple<int, int> tup: infop.IRDataU) {
-				int d;
-				int p;
-				tie(d, p) = tup;
-				grids[x][y+d]+=p;
-			}
+			int d;
+			int p;
+			tie(d, p) = infop.IRDataU;
+			grids[x][y+d]+=p;
+
+			tie(d, p) = infop.IRDataR;
+			grids[d+x][y]+=p;
+
+			tie(d, p) = infop.IRDataL;
+			grids[x-d][y]+=p;
+
+			tie(d, p) = infop.IRDataD;
+			grids[x][y-d]+=p;
 		
-			for (tuple<int, int> tup: infop.IRDataR) {
-				int d;
-				int p;
-				grids[d+x][y]+=p;
-			}
-			
-			for (tuple<int, int> tup: infop.IRDataL) {
-				int d;
-				int p;
-				tie(d, p) = tup;
-				grids[x-d][y]+=p;
-			}
-			
-			for (tuple<int, int> tup: infop.IRDataD) {
-				int d;
-				int p;
-				tie(d, p) = tup;
-				grids[x][y-d]+=p;
-			}
 			
 		}
 		
@@ -203,8 +207,7 @@ class Brain {
 			//break blocks
 			//get cube
 			//update count
-			getStack();
-
+			getStack());
 		
 		}
 		
@@ -287,7 +290,8 @@ class Brain {
 				
 				} else {std::cout<<"problem 2"<<std::endl;}
 				do {
-					if (pthread_mutex_lock(&mutex)==0){
+				if (pthread_mutex_lock(&mutex)==0){
+					
 					updateGrid(infop);
 		
 					if (str=="moveU") {
@@ -307,15 +311,26 @@ class Brain {
 					}
 					
 				} while (str!="stop"); 
+				
 				nextRoute.erase(nextRoute.begin());
+				//std::cout<<"at "<<x2_<<" "<<y2_<<"\n";
 				}
 
 			getCube();
 			
+			//testing
+			/**int xx2;
+			int yy2;
+			tie (xx2, yy2)=infop.robot.getLocation();
+			//std::cout<<"at "<<xx2<<" "<<yy2<<"\n";*/
 			route.erase(route.begin());
 		}
 		
 	}
+		
+		void unload() {
+			std::cout<<"unloaded\n";
+		}
 		
 		void spread(int x, int y) {
 		int p=1;
@@ -340,19 +355,87 @@ class Brain {
 			++p;
 		}
 	}
+	
+		void goToPlatform(info &infop, vector<tuple<int, int>> toPlatform) {
+			Grid::Location locs[100][100];
+			
+			for (int m=0; m<100; m++) {
+	  			for (int n=0; n<100; n++) {
+	    			locs[m][n] = make_tuple(m,n);
+				}	
+			}
+			Grid grid (locs);
+			string str;
+
+			while (toPlatform.size()!=0) {
+				Grid::Location start=infop.robot.getLocation();
+				Grid::Location goal= toPlatform.at(toPlatform.size()-1);
+				toPlatform=astarsearch(grid, start, goal, grids);
+				toPlatform.erase(toPlatform.begin());
+				tuple<int,int> nextPos=toPlatform.front();
+				int x1_;
+				int x2_;
+				int y1_;
+				int y2_;
+				tie (x1_, y1_)=infop.robot.getLocation();
+				tie (x2_, y2_)=nextPos;
+				if (x1_==x2_){
+					if (y1_>y2_) {
+						str="moveD";
+					} else if (y2_>y1_) {
+						str="moveU";
+					}
+				} else if (y1_==y2_) {
+					if (x1_>x2_) {
+						str="moveL";
+					} else if (x2_>x1_) {
+						str="moveR";
+					}
+				
+				} else {std::cout<<"problem 2"<<std::endl;}
+				do {
+				if (pthread_mutex_lock(&mutex)==0){
+					
+					updateGrid(infop);
+		
+					if (str=="moveU") {
+						move(infop, 'U');
+						str="stop";
+					} else if (str=="moveR") {
+						move(infop, 'R');
+						str="stop";
+					} else if (str=="moveL") {
+						move(infop, 'L');
+						str="stop";
+					} else if (str=="moveD") {
+						move(infop, 'D');
+						str="stop";
+					}
+					pthread_mutex_unlock(&mutex);
+					}
+					
+				} while (str!="stop"); 
+				
+			}
+
+		unload();
+	}
+	
 };
 
 
 
 int main() {
 	Map map;
+	map.createLinkArray();
 	Brain brain;
-	std::ifstream file ("red_map.txt"); //change to file name here
+	std::ifstream file ("MapFile.txt"); //change to file name here
 	
 		//read file
 		if (file.is_open()) { 
 			std::cout << "reading file" << std::endl;
     		for (string line; std::getline(file, line);) {
+        		std::cout << "newline= " << line << std::endl;
         		char *type= new char[line.length() + 1];
         		std::strcpy(type,line.c_str()); 
         		string remainder = line.substr(2);
@@ -363,12 +446,12 @@ int main() {
    		}
 		file.close();
 		
-		
+		//draw boundaries
 		for (int x=0; x<10; x++) {
 			for (int y=0; y<10; y++) {
 				int xi, yi;
 				tie (xi, yi) = map.gridLinks[x][y];
-				if (xi>0 || yi>0){
+				if (xi>-1){
 					if (xi>x && yi>y) {
 						for (int p=5; p<10; p++) {
 							brain.grids[x*10+p][y*10+p]+=100;
@@ -486,14 +569,26 @@ int main() {
 	   		int x;
 	   		int y;
 	   		tie(x,y)=start;
+	   		std::cout<< "start x= "<<x<<"\ty= "<<y<<"\n";
 	    		Grid::Location goal= std::make_tuple(m*10-5,n*10-5);
+	    		std::cout<< "goal x= "<<(m*10-5)<<"\ty= "<<(n*10-5)<<"\n";
 				brain.route.push_back(astarsearch(grid, start, goal, brain.grids));
 				start=goal;
 	    	} 
 	    	
 	 		}
 		}	
-
+		
+		//for testing
+		for (auto &nextRoute: brain.route) {
+		for (auto &pos:nextRoute) {
+			int x;
+			int y;
+			tie (x,y) = pos;
+			std::cout<<"x= "<<x<<" y= "<<y<<"\n";
+		}
+		std::cout<<"\n\n";
+		}
 
 	//make thread 
 	Robot robot(map);
@@ -511,11 +606,31 @@ int main() {
 		return 1;
 		
 	}
-
+	
 	brain.path(infos);
+	/**vector<tuple<int, int>> toPlatform;
+	start=robot.getLocation();
+	for (int m=0; m<10; m++) {
+	  	for (int n=0; n<10; n++) {
+	    	
+	   		if (map.lookForObstacles(m,n)=='P') {
+	    		Grid::Location goal= std::make_tuple(m*10-5,n*10-5);
+				toPlatform=(astarsearch(grid, start, goal, brain.grids));
+	    	} 
+	    	
+		}
+	}	
+	brain.goToPlatform(infos, toPlatform);*/
+		
 	brain.stop(infos);
-	
-	
+	/**for (int x=0; x<100; x++) {
+		std::cout<<"\n";
+		for (int y=0; y<100; y++) {
+			
+			std::cout<<brain.grids[x][y];
+			
+		}
+	}*/
 	if(pthread_join(brainthread, NULL)) {
 			fprintf(stderr, "Error joining thread\n");
 			return 2;

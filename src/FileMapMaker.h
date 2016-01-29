@@ -57,6 +57,14 @@ struct Map {
 	Stack lookForStacks(int x, int y) {
 		return gridStacks[x][y];
 	}
+	
+	  void createLinkArray() {
+    	for (int x=0; x<100; x++) {
+    		for (int y=0; y<100; y++) {
+    			gridLinks[x][y]=std::make_tuple(-1, -1);
+    		}
+    	}
+    }
     
 //makes everything from text file
 	void construct(char item, string input) {
