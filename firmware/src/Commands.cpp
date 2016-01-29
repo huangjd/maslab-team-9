@@ -302,8 +302,14 @@ bool Forward() {
   int speed;
   int amount;
   if (sscanf(rxbuf, "%d %d", &amount, &speed) == 2) {
-    digitalWrite(WHEEL_DIR_L, 0);
-    digitalWrite(WHEEL_DIR_R, 1);
+    if (speed > 0) {
+      digitalWrite(WHEEL_DIR_L, 0);
+      digitalWrite(WHEEL_DIR_R, 1);
+    } else {
+      digitalWrite(WHEEL_DIR_L, 1);
+      digitalWrite(WHEEL_DIR_R, 0);
+    }
+    speed = abs(speed);
     analogWrite(WHEEL_SPEED_L, speed);
     analogWrite(WHEEL_SPEED_R, speed);
     delay(amount);
