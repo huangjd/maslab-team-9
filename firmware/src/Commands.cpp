@@ -332,28 +332,7 @@ bool Init() {
 }
 
 bool randomMovement() {
-  int t = rand() % 180;
-  if (rand() % 2) {
-    digitalWrite(WHEEL_DIR_L, 0);
-    digitalWrite(WHEEL_DIR_R, 0);
-  } else {
-    digitalWrite(WHEEL_DIR_L, 1);
-    digitalWrite(WHEEL_DIR_R, 1);
-  }
-  analogWrite(WHEEL_SPEED_L, MOTOR_SPEED);
-  analogWrite(WHEEL_SPEED_R, MOTOR_SPEED);
-  delay(t * TURN_CONSTANT);
-  analogWrite(WHEEL_SPEED_L, 0);
-  analogWrite(WHEEL_SPEED_R, 0);
-
-  digitalWrite(WHEEL_DIR_L, 0);
-  digitalWrite(WHEEL_DIR_R, 1);
-
-  analogWrite(WHEEL_SPEED_L, MOTOR_SPEED);
-  analogWrite(WHEEL_SPEED_R, MOTOR_SPEED);
-  delay((rand() % 10) * 18 * FORWARD_CONSTANT);
-  analogWrite(WHEEL_SPEED_L, 0);
-  analogWrite(WHEEL_SPEED_R, 0);
+  RandomMotion();
   return true;
 }
 

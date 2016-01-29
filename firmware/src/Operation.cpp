@@ -81,6 +81,31 @@ void emergencyBackUp() {
   analogWrite(WHEEL_SPEED_R, 0);
 }
 
+void RandomMotion() {
+  int t = rand() % 180;
+  if (rand() % 2) {
+    digitalWrite(WHEEL_DIR_L, 0);
+    digitalWrite(WHEEL_DIR_R, 0);
+  } else {
+    digitalWrite(WHEEL_DIR_L, 1);
+    digitalWrite(WHEEL_DIR_R, 1);
+  }
+  analogWrite(WHEEL_SPEED_L, MOTOR_SPEED);
+  analogWrite(WHEEL_SPEED_R, MOTOR_SPEED);
+  delayMicroseconds(t * TURN_CONSTANT * 1000);
+  analogWrite(WHEEL_SPEED_L, 0);
+  analogWrite(WHEEL_SPEED_R, 0);
+
+  digitalWrite(WHEEL_DIR_L, 0);
+  digitalWrite(WHEEL_DIR_R, 1);
+
+  analogWrite(WHEEL_SPEED_L, MOTOR_SPEED);
+  analogWrite(WHEEL_SPEED_R, MOTOR_SPEED);
+  delayMicroseconds((rand() % 10) * 18 * FORWARD_CONSTANT * 1000);
+  analogWrite(WHEEL_SPEED_L, 0);
+  analogWrite(WHEEL_SPEED_R, 0);
+}
+
 void halt() {
   analogWrite(WHEEL_SPEED_L, 0);
   analogWrite(WHEEL_SPEED_R, 0);
@@ -91,7 +116,7 @@ void halt() {
   digitalWrite(CONTAINER_R_1, 0);
   digitalWrite(CONTAINER_R_2, 0);
 
+  cli();
   while (true) {
-    delay(1000);
   }
 }

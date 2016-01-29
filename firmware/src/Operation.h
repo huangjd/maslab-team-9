@@ -15,4 +15,6 @@ void emergencyBackUp();
 
 void halt();
 
+void RandomMotion();
+
 #endif // __OPERATION_H__

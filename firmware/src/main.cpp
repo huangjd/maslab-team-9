@@ -8,6 +8,9 @@
 #include "Operation.h"
 #include "Servo.h"
 
+#include "avr/interrupt.h"
+#include "avr/io.h"
+
 Servo leftServo, rightServo;
 
 IntervalTimer goodbye;
@@ -54,6 +57,9 @@ static void debugPrint(const char* c) {
   Serial.send_now();
 }
 
+void RandomMotionISR() {
+  RandomMotion();
+}
 
 void setup() {
   analogReadResolution(ADC_RESOLUTION);
@@ -93,6 +99,8 @@ void setup() {
   stepperOperation(RIGHT, DOWN, 10);
   stepperOperation(LEFT, UP, STEPPER_STEP_1 + STEPPER_STEP_2);
   stepperOperation(RIGHT, UP, STEPPER_STEP_1 + STEPPER_STEP_2);
+
+  attachInterrupt(digitalPinToInterrupt(TIMER1_INTERRUPT), RandomMotionISR, RISING);
 
   goodbye.begin((void(*)())endGame, gameTime);
 
