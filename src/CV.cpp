@@ -480,6 +480,7 @@ void Camera::moveTowardsCube() {
             }
 	      }
         }
+	}
         break;
         }
 }

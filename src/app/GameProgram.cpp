@@ -5,7 +5,8 @@
 #include <time.h>
 #include "../HAL.h"
 using namespace std;
-{
+
+int main(){
     Camera cam;
     while (true)
     {
@@ -36,4 +37,5 @@ using namespace std;
 
         randomMovement();
     }
+    return 0;
 }
