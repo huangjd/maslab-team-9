@@ -15,7 +15,8 @@ void clock(int pin, int hold, int d) {
 
 extern Servo leftServo, rightServo;
 void clampOperation(bool right, int angle) {
-  angle = constrain(angle, CLAMP_OPEN, CLAMP_CLOSE);
+  angle = constrain(angle, min(CLAMP_OPEN_L, CLAMP_OPEN_R),
+                    (CLAMP_CLOSE_L, CLAMP_CLOSE_R));
   if (right) {
     rightServo.write(angle);
   } else {

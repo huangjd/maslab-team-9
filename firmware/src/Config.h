@@ -86,8 +86,11 @@
 #define DOOR_MOTOR_SCALE   10
 #define DOOR_MOTOR_CONSATANT 10
 
-#define CLAMP_CLOSE           165
-#define CLAMP_OPEN            135
+#define CLAMP_CLOSE_L           160
+#define CLAMP_OPEN_L            130
+
+#define CLAMP_CLOSE_R           165
+#define CLAMP_OPEN_R            135
 
 #define EMERGENCY_BACKUP_AMOUNT 150
 

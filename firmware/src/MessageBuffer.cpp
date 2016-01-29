@@ -26,7 +26,7 @@ void TXBuffer::send() {
 
 bool MessageBuffer::dispatch() {
   char cmd = rxbuf[0];
-  if (cmd >= 64 && cmd < 128) {
+  if (cmd >= (char)64 && cmd < (char)128) {
     rxbuf[0] = ' ';
     return commandsRegister[cmd - (char)64]();
   } else {

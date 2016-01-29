@@ -208,10 +208,12 @@ static bool readIR() {
 static bool pickup() {
   unsigned int side;
   if (sscanf(rxbuf, "%u", &side) && (side < 2)) {
+    int close = (side & RIGHT ? CLAMP_CLOSE_R : CLAMP_CLOSE_L);
+    int open = (side & RIGHT ? CLAMP_OPEN_R : CLAMP_OPEN_L);
     stepperOperation(side, DOWN, STEPPER_STEP_1);
-    clampOperation(side, CLAMP_OPEN);
+    clampOperation(side, open);
     stepperOperation(side, DOWN, STEPPER_STEP_2);
-    clampOperation(side, CLAMP_CLOSE);
+    clampOperation(side, close);
     stepperOperation(side, UP, STEPPER_STEP_1 + STEPPER_STEP_2);
     return true;
   }
@@ -224,17 +226,17 @@ static bool release() {
     bool platform = mode & 2;
     bool side = mode & RIGHT;
     if (platform) {
-      clampOperation(side, CLAMP_OPEN);
+      clampOperation(side, CLAMP_OPEN_R);
       doorOperation(side | OPEN);
       emergencyBackUp();
-      clampOperation(side, CLAMP_CLOSE);
+      clampOperation(side, CLAMP_CLOSE_R);
     } else {
       stepperOperation(side, DOWN, STEPPER_STEP_1 + STEPPER_STEP_2);
-      clampOperation(side, CLAMP_OPEN);
+      clampOperation(side, CLAMP_OPEN_R);
       doorOperation(side | OPEN);
       emergencyBackUp();
       stepperOperation(side, UP, STEPPER_STEP_1 + STEPPER_STEP_2);
-      clampOperation(side, CLAMP_CLOSE);
+      clampOperation(side, CLAMP_CLOSE_R);
     }
     return true;
   }
@@ -245,10 +247,10 @@ static bool endGame() {
   extern bool StackRed;
   if (StackRed) {
     stepperOperation(RIGHT, DOWN, STEPPER_STEP_1 + STEPPER_STEP_2);
-    clampOperation(RIGHT, CLAMP_OPEN);
+    clampOperation(RIGHT, CLAMP_OPEN_R);
   } else {
     stepperOperation(LEFT, DOWN, STEPPER_STEP_1 + STEPPER_STEP_2);
-    clampOperation(LEFT, CLAMP_OPEN);
+    clampOperation(LEFT, CLAMP_OPEN_R);
   }
   halt();
   return true;

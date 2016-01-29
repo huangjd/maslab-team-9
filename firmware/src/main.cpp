@@ -80,8 +80,8 @@ void setup() {
 
   leftServo.attach(CLAMP_L);
   rightServo.attach(CLAMP_R);
-  leftServo.write(CLAMP_CLOSE);
-  rightServo.write(CLAMP_CLOSE);
+  leftServo.write(CLAMP_CLOSE_L);
+  rightServo.write(CLAMP_CLOSE_R);
 
   stepperOperation(LEFT, DOWN, 10);
   stepperOperation(RIGHT, DOWN, 10);
