@@ -147,6 +147,7 @@ void StackContours(const cv::Mat& src, const cv::Mat& src_binary_r, const cv::Ma
 
             rect_r[i] = minAreaRect( Mat(contours_r[i]) );
 
+
             Point2f rect_points[4], corner1, corner2;
             rect_r[i].points( rect_points );
 
@@ -263,6 +264,7 @@ Camera::Camera() : resX(320), resY(240), cap(0), thresCanny(130), cubeNotFound(0
   }
   cap.set(CV_CAP_PROP_FRAME_WIDTH,resX);
   cap.set(CV_CAP_PROP_FRAME_HEIGHT,resY);
+  cap.set(CV_CAP_PROP_BUFFERSIZE, 3);
 }
 
 Camera::~Camera() {
@@ -297,14 +299,17 @@ void Camera::moveTowardsCube() {
             Point2f target = blockCenter_r[0];
 
             ///Fix the decimal values
-            if((target.x > (resX - 0.20*resX))&&(target.y > 0.1*resY)&&(target.y <  0.20*resY)) //If cube is in corner
+            if((target.x > (resX - 0.15*resX))&&(target.y > 0.1*resY)&&(target.y <  0.25*resY)) //If cube is in corner
             {
                 move_forward(2);
                 cubeFound++;
 		waitKey(1000);
 		pickup(true);
-                move_forward(-1);
+		waitKey(500);
+                move_forward(-2);
                 waitKey(500);
+		for(int j = 0; j < 10; j++)
+		  cap>>image;    
             }
             else if(target.y < 0.1*resY) //If cube is too far right
             {
@@ -314,7 +319,7 @@ void Camera::moveTowardsCube() {
             {
                 turn(-1);
             }
-            else if(target.x < (resX - 0.25*resX)) //If cube is too far forward
+            else if(target.x < (resX - 0.15*resX)) //If cube is too far forward
             {
                 move_forward(1);
                 waitKey(500);
@@ -332,16 +337,19 @@ void Camera::moveTowardsCube() {
             Point2f target = blockCenter_g[0];
 
 
-            if((target.x > (resX - 0.20*resX))&&(target.y > (resY - 0.20*resY))&&(target.y < (resY - 0.1*resY))) //If cube is in corner
+            if((target.x > (resX - 0.15*resX))&&(target.y > (resY - 0.20*resY))&&(target.y < (resY - 0.1*resY))) //If cube is in corner
             {
                 move_forward(2);
                 cubeFound++;
 		waitKey(1000);
 		pickup(false);
-                move_forward(-1);
+		waitKey(500);
+                move_forward(-2);
                 waitKey(500);
+		for(int j = 0; j < 10; j++)
+		  cap>>image;    
             }
-            else if(target.y < (resY - 0.25*resY)) //If cube is too far right
+            else if(target.y < (resY - 0.20*resY)) //If cube is too far right
             {
                 turn(1);
             }
@@ -349,7 +357,7 @@ void Camera::moveTowardsCube() {
             {
                 turn(-1);
             }
-            else if(target.x < (resX - 0.25*resX)) //If cube is too far forward
+            else if(target.x < (resX - 0.15*resX)) //If cube is too far forward
             {
                 move_forward(1);
                 waitKey(500);
