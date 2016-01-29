@@ -10,7 +10,7 @@ using namespace std;
 
 void move_to(double delta_x, double delta_y) {
   double degree = atan2(delta_y, delta_x);
-  turn(degree);
+  turn(degree / 3.1416 * 180);
   move_forward(hypot(delta_x, delta_y));
 }
 
