@@ -26,5 +26,8 @@ void halt();
 
 void echo(const std::string &in, std::string &out);
 
+void charge();
+
+void move_forward_custom_speed(int x, int power = 64);
 
 #endif // __HAL_H__

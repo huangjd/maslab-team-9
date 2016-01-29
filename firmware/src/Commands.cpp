@@ -298,13 +298,29 @@ bool KnockStack() {
   return true;
 }
 
+bool Forward() {
+  int speed;
+  int amount;
+  if (sscanf(rxbuf, "%d %d", &amount, &speed) == 2) {
+    digitalWrite(WHEEL_DIR_L, 0);
+    digitalWrite(WHEEL_DIR_R, 1);
+    analogWrite(WHEEL_SPEED_L, power);
+    analogWrite(WHEEL_SPEED_R, power);
+    delay(amount);
+    analogWrite(WHEEL_SPEED_L, 0);
+    analogWrite(WHEEL_SPEED_R, 0);
+    return true;
+  }
+  return false;
+}
+
 bool Init() {
 
   return true;
 }
 
 bool (*commandsRegister[64])() = {
-    Init, writeAnalog, badcmd, ClampHL, writeDigital, endGame, badcmd, setStackRed, // @ABCDEFG
+    Init, writeAnalog, badcmd, ClampHL, writeDigital, endGame, Forward, setStackRed, // @ABCDEFG
     Halt, readIRDist, badcmd, KnockStack, badcmd, moveForward, badcmd, badcmd, // HIJKLMNO
     pickup, badcmd, release, badcmd, turn, badcmd, badcmd, badcmd, // PQRSTUVW
     badcmd, badcmd, badcmd, badcmd, badcmd, badcmd, badcmd, badcmd, // XYZ[\]^_

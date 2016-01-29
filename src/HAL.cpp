@@ -20,6 +20,12 @@ void move_forward(int x) {
   usbProxy.sendCmd(s);
 }
 
+void move_forward_custom_speed(int x, int power) {
+  char s[20];
+  sprintf(s, "F %d %d", x * 18, power);
+  usbProxy.sendCmd(s);
+}
+
 void turn(int deg) {
   char s [20];
   sprintf(s, "T %d", deg);
@@ -55,6 +61,10 @@ void releaseToPlatform(bool side) {
   } else {
     usbProxy.sendCmd("R 2");
   }
+}
+
+void charge() {
+  usbProxy.sendCmd("K");
 }
 
 void halt() {

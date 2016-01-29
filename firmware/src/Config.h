@@ -74,7 +74,7 @@
 #define MOTOR_SPEED        64
 
 #define KNOCK_SPEED        255
-#define KNOCK_CONSTANT     100
+#define KNOCK_CONSTANT     450
 
 #define FORWARD_CONSTANT   20
 #define TURN_CONSTANT      20
