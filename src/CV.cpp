@@ -256,7 +256,7 @@ void StackContours(const cv::Mat& src, const cv::Mat& src_binary_r, const cv::Ma
 
 }
 
-Camera::Camera() : resX(320), resY(240), cap(0), thresCanny(130), cubeNotFound(0), stackNotFound(0) {
+Camera::Camera() : resX(320), resY(240), cap(0), thresCanny(130), cubeNotFound(0), stackNotFound(0), gameMode(0) {
   cap.open(0);
   if (!cap.isOpened()) {
     cout << "Cannot open the web cam" << endl;
