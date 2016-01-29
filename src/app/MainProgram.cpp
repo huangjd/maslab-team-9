@@ -1,10 +1,10 @@
 #include <pthread.h>
 #include <stdio.h>
-#include "../maprelated/Astar.h"
+#include "Astar.h"
 #include <iostream>
-#include "../maprelated/FileMapMaker.h"
+#include "FileMapMaker.h"
 #include "StackGet.h"
-#include "../HAL.h"
+#include "HAL.h"
 #include <cstdio>
 #include  <ctime>
 using std::tuple;
@@ -131,10 +131,8 @@ struct info {
 };
 
 void *robotDo(void *com) {
-	std::cout<< "reached multithread" << std::endl;
 	struct info *commands= (struct info*)com;
 	string command=commands->com;
-	//std::cout<<"command= "<<command<<std::endl;
 	while (command!="stop") {
 		command=commands->com;
 		pthread_mutex_lock(&mutex);
@@ -144,7 +142,6 @@ void *robotDo(void *com) {
 		commands->IRDataD=commands->robot.getIRDataD();
 		pthread_mutex_unlock(&mutex);
 	}
-	std::cout<<"ending"<<std::endl;
 	return NULL;
 		
 }
@@ -206,9 +203,8 @@ class Brain {
 			//break blocks
 			//get cube
 			//update count
-			if (getStack()) {
-				std::cout<<"got cube"<<std::endl;
-			}
+			getStack();
+
 		
 		}
 		
@@ -312,16 +308,10 @@ class Brain {
 					
 				} while (str!="stop"); 
 				nextRoute.erase(nextRoute.begin());
-				//std::cout<<"at "<<x2_<<" "<<y2_<<"\n";
 				}
 
 			getCube();
 			
-			//testing
-			/**int xx2;
-			int yy2;
-			tie (xx2, yy2)=infop.robot.getLocation();
-			//std::cout<<"at "<<xx2<<" "<<yy2<<"\n";*/
 			route.erase(route.begin());
 		}
 		
@@ -363,7 +353,6 @@ int main() {
 		if (file.is_open()) { 
 			std::cout << "reading file" << std::endl;
     		for (string line; std::getline(file, line);) {
-        		std::cout << "newline= " << line << std::endl;
         		char *type= new char[line.length() + 1];
         		std::strcpy(type,line.c_str()); 
         		string remainder = line.substr(2);
@@ -372,7 +361,6 @@ int main() {
    		} else {
    			std::cout << "file not opening" << std::endl;
    		}
-   		std::cout<<"done reading"<<std::endl;
 		file.close();
 		
 		
@@ -498,24 +486,14 @@ int main() {
 	   		int x;
 	   		int y;
 	   		tie(x,y)=start;
-	   		std::cout<< "start x= "<<x<<"\ty= "<<y<<"\n";
 	    		Grid::Location goal= std::make_tuple(m*10-5,n*10-5);
-	    		std::cout<< "goal x= "<<(m*10-5)<<"\ty= "<<(n*10-5)<<"\n";
 				brain.route.push_back(astarsearch(grid, start, goal, brain.grids));
 				start=goal;
 	    	} 
 	    	
 	 		}
 		}	
-		for (auto &nextRoute: brain.route) {
-		for (auto &pos:nextRoute) {
-			int x;
-			int y;
-			tie (x,y) = pos;
-			std::cout<<"x= "<<x<<" y= "<<y<<"\n";
-		}
-		std::cout<<"\n\n";
-		}
+
 
 	//make thread 
 	Robot robot(map);
