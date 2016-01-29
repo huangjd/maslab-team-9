@@ -245,7 +245,7 @@ static bool release() {
   return false;
 }
 
-static bool endGame() {
+ bool endGame() {
   extern bool StackRed;
   if (StackRed) {
     stepperOperation(RIGHT, DOWN, STEPPER_STEP_1 + STEPPER_STEP_2);
