@@ -22,7 +22,7 @@ int main(){
         {
             cam.moveTowardsStack();
             int v1 = rand() % 1000;
-            if((cam.stackFound >= 1)||(cam.stackNotFound >= 1000)||(v1==1000))
+            if((cam.stackFound >= 1)||(cam.stackNotFound >= 300)||(v1==1000))
                break;
         }
         if(cam.stackFound >= 1)
@@ -30,7 +30,7 @@ int main(){
             while (true)
             {
                 cam.moveTowardsCube();
-                if(cam.cubeNotFound >= 1000)
+                if(cam.cubeNotFound >= 300)
                     break;
             }
         }
