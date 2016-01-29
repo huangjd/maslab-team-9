@@ -5,14 +5,13 @@
 #include "../maprelated/FileMapMaker.h"
 #include "StackGet.h"
 #include "../HAL.h"
-
+#include <cstdio>
+#include  <ctime>
 using std::tuple;
 using std::vector;
-pthread_mutex_t mutex;
 
-class threadWatcher {
-	//timer
-};
+pthread_mutex_t mutex;
+std::clock_t timer; //currently not used
 
 class Robot {
 private:
@@ -207,11 +206,9 @@ class Brain {
 			//break blocks
 			//get cube
 			//update count
-			//if (StackGet.getStack()) {
+			if (getStack()) {
 				std::cout<<"got cube"<<std::endl;
-			//} else {
-			//	std::cout<<"we screwed up"<<std::endl;
-			//}
+			}
 		
 		}
 		
@@ -387,66 +384,83 @@ int main() {
 					if (xi>x && yi>y) {
 						for (int p=5; p<10; p++) {
 							brain.grids[x*10+p][y*10+p]+=100;
-							
+							brain.spread(x*10+p, y*10+p);
 						}
 						for (int p=0; p<5; p++) {
 							brain.grids[xi*10+p][yi*10+p]+=100;
+							brain.spread(xi*10+p, yi*10+p);
 						}
 					} else if (xi>x && yi==y) {
 						for (int p=5; p<10; p++) {
 							brain.grids[x*10+p][y*10+5]+=100;
+							brain.spread(x*10+p, y*10+5);
 						}
 						for (int p=0; p<5; p++) {
 							brain.grids[xi*10+p][yi*10+5]+=100;
+							brain.spread(xi*10+p, yi*10+5);
 						}
 					} else if (xi>x && yi<y) {
 						for (int p=5; p<10; p++) {
 							brain.grids[x*10+p][y*10+9-p]+=100;
+							brain.spread(x*10+p, y*10+9-p);
 						}
 						for (int p=0; p<5; p++) {
 							brain.grids[xi*10+p][yi*10+9-p]+=100;
+							brain.spread(xi*10+p, yi*10+9-p);
 						}
 					} else if (xi<x && yi>y) {
 						for (int p=5; p<10; p++) {
 							brain.grids[x*10+9-p][y*10+p]+=100;
+							brain.spread(x*10+9-p, y*10+p);
 						}
 						for (int p=0; p<5; p++) {
 							brain.grids[xi*10+9-p][yi*10+p]+=100;
+							brain.spread(xi*10+9-p, yi*10+p);
 						}
 					} else if (xi<x && yi==y) {
 						for (int p=5; p<10; p++) {
 							brain.grids[x*10+9-p][y*10+5]+=100;
+							brain.spread(x*10+9-p, y*10+5);
 						}
 						for (int p=0; p<5; p++) {
 							brain.grids[xi*10+9-p][yi*10+5]+=100;
+							brain.spread(xi*10+9-p, yi*10+5);
 						}
 					} else if (xi<x && yi<y) {
 						for (int p=5; p<10; p++) {
 							brain.grids[x*10+9-p][y*10+9-p]+=100;
+							brain.spread(x*10+9-p, y*10+9-p);
 						}
 						for (int p=0; p<5; p++) {
 							brain.grids[xi*10+9-p][yi*10+9-p]+=100;
+							brain.spread(xi*10+9-p, yi*10+9-p);
 						}
 					} else if (xi==x && yi>y) {
 						for (int p=5; p<10; p++) {
 							brain.grids[x*10+5][y*10+p]+=100;
+							brain.spread(x*10+5, y*10+p);
 						}
 						for (int p=0; p<5; p++) {
 							brain.grids[xi*10+5][yi*10+p]+=100;
+							brain.spread(xi*10+5, yi*10+p);
 						}
 					} else if (xi==x && yi==y) {
 						for (int p=5; p<10; p++) {
 							brain.grids[x*10+5][y*10+5]+=100;
+							brain.spread(x*10+5, y*10+5);
 						}
 						for (int p=0; p<5; p++) {
 							brain.grids[xi*10+5][yi*10+5]+=100;
+							brain.spread(xi*10+5, yi*10+5);
 						}
 					} else if (xi==x && yi<y) {
 						for (int p=5; p<10; p++) {
 							brain.grids[x*10+5][y*10+9-p]+=100;
+							brain.spread(x*10+5, y*10+9-p);
 						}
 						for (int p=0; p<5; p++) {
 							brain.grids[xi*10+5][yi*10+9-p]+=100;
+							brain.spread(xi*10+5, yi*10+9-p);
 						}
 					} 
 			}}
@@ -454,10 +468,10 @@ int main() {
 		}
 		
 		//for testing
-		for (int x=0; x<100; x++) {
+		for (int y=0; y<100; y++) {
 		std::cout<<"\n";
-			for (int y=0; y<100; y++) {
-						if (brain.grids[y][x]==100) {
+			for (int x=0; x<100; x++) {
+						if (brain.grids[x][y]>=50) {
 							std::cout<<".";
 						} else std::cout<<" ";
 					}
