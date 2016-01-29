@@ -368,7 +368,7 @@ int main() {
 			for (int y=0; y<10; y++) {
 				int xi, yi;
 				tie (xi, yi) = map.gridLinks[x][y];
-				if (xi>0){
+				if (xi>0 || yi>0){
 					if (xi>x && yi>y) {
 						for (int p=5; p<10; p++) {
 							brain.grids[x*10+p][y*10+p]+=100;
