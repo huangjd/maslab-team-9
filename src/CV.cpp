@@ -287,12 +287,11 @@ void Camera::moveTowardsCube() {
       	imshow("Camera Feed", imageDrawn);   //Display camera
 	#endif
 
-	///Actions to do if cube is found
-        //Red cube has priority; first detected cube will be picked up
-
-        ///If Red Cube is present (priority over green)
-        //Goes to right stack
-        //Moves to have cube with center at top right corner
+	switch(gameMode)
+	{
+    case 0:
+        {
+        ///Actions to do if cube is found
         if(blockCenter_r.size() > 0)
         {
             cubeNotFound = 0;
@@ -303,13 +302,13 @@ void Camera::moveTowardsCube() {
             {
                 move_forward(2);
                 cubeFound++;
-		waitKey(1000);
-		pickup(true);
-		waitKey(500);
+                waitKey(1000);
+                pickup(true);
+                waitKey(500);
                 move_forward(-2);
                 waitKey(500);
-		for(int j = 0; j < 10; j++)
-		  cap>>image;    
+                for(int j = 0; j < 10; j++)
+                    cap>>image;
             }
             else if(target.y < 0.1*resY) //If cube is too far right
             {
@@ -347,7 +346,7 @@ void Camera::moveTowardsCube() {
                 move_forward(-2);
                 waitKey(500);
 		for(int j = 0; j < 10; j++)
-		  cap>>image;    
+		  cap>>image;
             }
             else if(target.y < (resY - 0.20*resY)) //If cube is too far right
             {
@@ -375,7 +374,7 @@ void Camera::moveTowardsCube() {
 	    if(cubeNotFound % 5)
 	      {
             ///If no cube present (accounting for noise)
-            if(cubeNotFound >= 200) 
+            if(cubeNotFound >= 200)
             {
                 turn(1);
             }
@@ -384,6 +383,104 @@ void Camera::moveTowardsCube() {
                 turn(-1); //Turn
             }
 	      }
+        }
+        break;
+        }
+    case 1:
+        {
+        if(blockCenter_g.size() > 0)
+        {
+            cubeNotFound = 0;
+            Point2f target = blockCenter_g[0];
+
+
+            if((target.x > (resX - 0.2*resX))&&(target.y > (resY - 0.2*resY))&&(target.y < (resY - 0.1*resY))) //If cube is in corner
+            {
+                move_forward(2);
+                cubeFound++;
+		waitKey(1000);
+		pickup(false);
+		waitKey(500);
+                move_forward(-2);
+                waitKey(500);
+		for(int j = 0; j < 10; j++)
+		  cap>>image;
+            }
+            else if(target.y < (resY - 0.20*resY)) //If cube is too far right
+            {
+                turn(1);
+            }
+            else if(target.y > (resY - 0.1*resY)) //If cube is too far left
+            {
+                turn(-1);
+            }
+            else if(target.x < (resX - 0.2*resX)) //If cube is too far forward
+            {
+                move_forward(1);
+                waitKey(500);
+            }
+#ifdef SHOW_COUT
+            cout << "g: " << target.x << ", " << target.y << endl;
+#endif
+        }
+        else if(blockCenter_r.size() > 0)
+        {
+            cubeNotFound = 0;
+            Point2f target = blockCenter_r[0];
+
+            ///Fix the decimal values
+            if((target.x > (resX - 0.2*resX))&&(target.y > 0.1*resY)&&(target.y <  0.25*resY)) //If cube is in corner
+            {
+                move_forward(2);
+                cubeFound++;
+                waitKey(1000);
+                pickup(true);
+                waitKey(500);
+                move_forward(-2);
+                waitKey(500);
+                for(int j = 0; j < 10; j++)
+                    cap>>image;
+            }
+            else if(target.y < 0.1*resY) //If cube is too far right
+            {
+                turn(1);
+            }
+            else if(target.y > 0.25*resY) //If cube is too far left
+            {
+                turn(-1);
+            }
+            else if(target.x < (resX - 0.2*resX)) //If cube is too far forward
+            {
+                move_forward(1);
+                waitKey(500);
+            }
+#ifdef SHOW_COUT
+            cout << "r: " << target.x << ", " << target.y << endl;
+#endif
+        }
+        ///If Green Cube is present and not red
+        //Goes to right stack
+        //Moves to have cube with center at bottom right corner
+        else
+        {
+            cubeNotFound++;
+#ifdef SHOW_COUT
+            cout << cubeNotFound << endl;
+#endif
+	    if(cubeNotFound % 5)
+	      {
+            ///If no cube present (accounting for noise)
+            if(cubeNotFound >= 200)
+            {
+                turn(1);
+            }
+            else if(cubeNotFound > 20)
+            {
+                turn(-1); //Turn
+            }
+	      }
+        }
+        break;
         }
 }
 
