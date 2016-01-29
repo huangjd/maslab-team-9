@@ -10,14 +10,6 @@ using std::tuple;
 using std::vector;
 pthread_mutex_t mutex;
 
-
-struct Array {
-	public:
-	int grid[10][10]={{0}};
-	Array(void) {};
-	
-};
-
 class threadWatcher {
 	//timer
 };
@@ -26,78 +18,63 @@ class Robot {
 private:
 	Map mapForTesting;
 	
-	double xlocation;
-	double ylocation;
+	int xlocation;
+	int ylocation;
 	int directionFacing;
 	
 public:
 	Robot(void) {};
 	Robot(Map fake): mapForTesting(fake) {
 		std::tie(xlocation, ylocation)= mapForTesting.getStart();
-		//std::cout<<"start x= "<<xlocation<<" start y= "<<ylocation<<std::endl;
+		xlocation=xlocation*10-5;
+		ylocation=ylocation*10-5;
 	};
 	
 	void moveU () {
-    int turni=360-directionFacing;
-    turni%=360;
-    changeDirectionFacing(turni);
-    double turnd=turni;
-    turn(turnd);
-    move_forward(1);
-		ylocation+=0.1;
-		//std::cout<<"new y= "<<ylocation<<std::endl;
+		int turni=360-directionFacing;
+		turni%=360;
+		double turnd=360-directionFacing;
+		changeDirectionFacing(turni);
+		turn(turnd);
+		move_forward(1);
+		ylocation+=1;
 	}
 	
 	void moveL () {
-    int turni=360-directionFacing;
-    turni%=360;
-    changeDirectionFacing(turni);
-    double turnd=turni;
-    turn(turnd);
-    move_forward(1);
-		xlocation-=0.1;
-		//std::cout<<"new x= "<<xlocation<<std::endl;
+		int turni=270+360-directionFacing;
+		turni%=360;
+		double turnd=360-directionFacing;
+		changeDirectionFacing(turni);
+		turn(turnd);
+		move_forward(1);
+		xlocation-=1;
 	}
 	
 	void moveR () {
-    int turni=360-directionFacing;
-    turni%=360;
-    changeDirectionFacing(turni);
-    double turnd=turni;
-    turn(turnd);
-    move_forward(1);
-		xlocation+=0.1;
-		//std::cout<<"new x= "<<xlocation<<std::endl;
+		int turni=90+360-directionFacing;
+		turni%=360;
+		double turnd=360-directionFacing;
+		changeDirectionFacing(turni);
+		turn(turnd);
+		move_forward(1);
+		xlocation+=1;
 	}
 	
 	void moveD () {
-    int turni=360-directionFacing;
-    turni%=360;
-    changeDirectionFacing(turni);
-    double turnd=turni;
-    turn(turnd);
-    move_forward(1);
-		ylocation-=0.1;
-		//std::cout<<"new y= "<<ylocation<<std::endl;
+		int turni=180+360-directionFacing;
+		turni%=360;
+		double turnd=360-directionFacing;
+		changeDirectionFacing(turni);
+		turn(turnd);
+		move_forward(1);
+		ylocation-=1;
 	}
 	
 	char lookWithCamera(string str) {
-		int x, y;
-		while (xlocation>10) {
-			xlocation-=10;
-			++x;
-		}
-		while (ylocation>10) {
-			ylocation-=10;
-			++y;
-		}
-		if (str=="top") {char color=mapForTesting.lookForStacks(x, y).getTopBlock();}
-		else if (str=="mid") {char color=mapForTesting.lookForStacks(x, y).getMidBlock();}
-		else if (str=="bot") {char color=mapForTesting.lookForStacks(x, y).getBotBlock();}
-		else {std::cout<<"wrong look at camera"<<std::endl;}
 	}
 	
-	int getDirectionFacing() {
+	//combine this with move later
+	double getDirectionFacing() {
 		return directionFacing;
 	}
 	
@@ -105,29 +82,27 @@ public:
 		return std::make_tuple(xlocation, ylocation);
 	}
 	
-	//currently makes all walls 5x5 in the 100x100 grid
-	//returns a vector of distance in the 100x100 grid and obstacle prob
 	vector<tuple<int, int>> getIRDataU() {
 		vector<tuple<int,int>> IRDataU;
-		IRDataU.push_back(std::make_tuple(1, 0));
+		IRDataU.push_back(std::make_tuple(1, 10));
 		return IRDataU;
 	}
 	
 	vector<tuple<int, int>> getIRDataL() {
 		vector<tuple<int,int>> IRDataL;
-		IRDataL.push_back(std::make_tuple(1, 0));
+		IRDataL.push_back(std::make_tuple(1, 10));
 		return IRDataL;
 	}
 	
 	vector<tuple<int, int>> getIRDataR() {
 		vector<tuple<int,int>> IRDataR;
-		IRDataR.push_back(std::make_tuple(1, 0));
+		IRDataR.push_back(std::make_tuple(1, 10));
 		return IRDataR;
 	}
 	
 	vector<tuple<int, int>> getIRDataD() {
 		vector<tuple<int,int>> IRDataD;
-		IRDataD.push_back(std::make_tuple(1, 0));
+		IRDataD.push_back(std::make_tuple(1, 10));
 		return IRDataD;
 	}
 	
@@ -183,12 +158,11 @@ class Brain {
 	vector<tuple<int,int>> stacksToBeVisited;
 	vector<tuple<int,int>> blocksCollected;
 	vector<tuple<int,int>> blocksDiscarded;
-	//vector<tuple<int,int>> locationsVisited; 
 	vector<tuple<int, int>> IRDataU; 
 	vector<tuple<int, int>> IRDataL;
 	vector<tuple<int, int>> IRDataR;
 	vector<tuple<int, int>> IRDataD;
-	Array grids[10][10]; //this is the 100x100 grid
+	int grids[100][100]={{0}};
 	//each time you revisit a position, increase its obstacle prob. value with
 	//diminishing returns
 	//implement timeout with threads
@@ -199,73 +173,32 @@ class Brain {
 		void updateGrid(info infop) {
 			int x; 
 			int y;
-			double xprecised;
-			double yprecised;
-			tie(xprecised, yprecised)=infop.robot.getLocation();
-			x=xprecised*1.002;
-			y=yprecised*1.002;
-			int xprecise=(xprecised-double(x))*10.002;
-			int yprecise=(yprecised-double(y))*10.002;
-			
+			tie(x, y)=infop.robot.getLocation();
 			for (tuple<int, int> tup: infop.IRDataU) {
 				int d;
 				int p;
 				tie(d, p) = tup;
-
-				if (yprecise+d>9) {
-					int innery=y+1;
-					int newVal=yprecise+d-10;
-					grids[x][innery].grid[xprecise][newVal]+=p;
-				} else {
-					grids[x][y].grid[xprecise][yprecise+d]+=p;
-				}
-				
+				grids[x][y+d]+=p;
 			}
 		
 			for (tuple<int, int> tup: infop.IRDataR) {
 				int d;
 				int p;
-				tie(d, p) = tup;
-				if (xprecise+d>9) {
-					int innerx;
-					innerx=x+1;
-					int newVal=(xprecise+d)-10;
-					grids[innerx][y].grid[newVal][yprecise]+=p;
-					
-				} else {
-					
-					grids[x][y].grid[xprecise+d][yprecise]+=p;
-				}
+				grids[d+x][y]+=p;
 			}
 			
 			for (tuple<int, int> tup: infop.IRDataL) {
 				int d;
 				int p;
 				tie(d, p) = tup;
-				if (xprecise-d<0) {
-					int innerx=x-1;
-					int newVal=xprecise-d+10;
-					grids[innerx][y].grid[newVal][yprecise]+=p;
-					
-				} else {
-					
-					grids[x][y].grid[xprecise-d][yprecise]+=p;
-				}
-				
+				grids[x-d][y]+=p;
 			}
 			
 			for (tuple<int, int> tup: infop.IRDataD) {
 				int d;
 				int p;
 				tie(d, p) = tup;
-				if (yprecise-d<0) {
-					int innery=y-1;
-					int newVal=yprecise-d+10;
-					grids[x][innery].grid[xprecise][newVal]+=p;
-				} else {
-					grids[x][y].grid[xprecise][yprecise-d]+=p;
-				}
-				
+				grids[x][y-d]+=p;
 			}
 			
 		}
@@ -274,11 +207,11 @@ class Brain {
 			//break blocks
 			//get cube
 			//update count
-			if (getStack()) {
+			//if (StackGet.getStack()) {
 				std::cout<<"got cube"<<std::endl;
-			} else {
+			//} else {
 			//	std::cout<<"we screwed up"<<std::endl;
-			}
+			//}
 		
 		}
 		
@@ -290,21 +223,14 @@ class Brain {
 			if (degree==90) {infop.robot.changeDirectionFacing(90);}
 			else if (degree==180) {infop.robot.changeDirectionFacing(180);}
 			else if (degree==270) {infop.robot.changeDirectionFacing(270);}
-			else {std::cout<<"I refuse."<<std::endl;}
 		}
 		
 		void move(info &infop, char movement) {
 			tuple<double, double> loc=infop.robot.getLocation();
 			int x;
 			int y;
-			double xprecise;
-			double yprecise;
-			tie (xprecise, yprecise)=loc;
-			x=xprecise*1.002;
-			y=yprecise*1.002;
-			int xsmall=(xprecise-double(x))*10.002;
-			int ysmall=(yprecise-double(y))*10.002;
-			grids[x][y].grid[xsmall][ysmall]+=5;
+			tie (x, y)=loc;
+			grids[x][y]+=2;
 			if (movement=='U') {infop.robot.moveU();}
 			else if (movement=='L') {infop.robot.moveL();}
 			else if (movement=='R') {infop.robot.moveR();}
@@ -329,101 +255,30 @@ class Brain {
 		}
 		
 		void path(info &infop) {
-			Grid::Location locs[10][10];
-			for (int m=0; m<10; m++) {
-	  		for (int n=0; n<10; n++) {
-	    		locs[m][n] = make_tuple(m,n);
-			}	
-		}
-			Grid grid (locs);
 		//put in override function when surrounded by walls
-		
+		Grid::Location locs[100][100];
+		for (int m=0; m<100; m++) {
+	  	for (int n=0; n<100; n++) {
+	    	locs[m][n] = make_tuple(m,n);
+		}	
+		}
+		Grid grid (locs);
 		while (route.size()!=0) {
 			vector<tuple<int, int>> nextRoute=route.front();
-			//getting route to new stack
-			for (auto &lroute: route) {
-			tuple<int,int> pos=lroute.front();
-			int x;
-			int y;
-			tie (x,y)=pos;
-			}
-			string toNewGrid;
-			
+			string str;
+
 			while (nextRoute.size()!=0) {
-			//getting new position in current route to stack
+				Grid::Location start=infop.robot.getLocation();
+				Grid::Location goal= nextRoute.at(nextRoute.size()-1);
+				nextRoute=astarsearch(grid, start, goal, grids);
+				nextRoute.erase(nextRoute.begin());
 				tuple<int,int> nextPos=nextRoute.front();
-				bool check=false;
-				string str;
-				vector<tuple<int,int>> smallRoute;
-				double x1d;
-				double y1d;
-				double x2d;
-				double y2d;
-				int x1;
-				int x2;
-				int y1;
-				int y2;
-				tie (x1d, y1d) = infop.robot.getLocation();
-				x1=x1d*1.002;
-				y1=y1d*1.002;
-				tie (x2d, y2d) = nextPos;
-				x2=x2d*1.002;
-				y2=y2d*1.002;
-
-				//this is going to be changed
-				//moving on small grid to next big grid
-				Grid::Location goal;
-				Grid::Location start;
-				if (x1==x2 && y1==y2) {
-					getCube();
-					std::cout<<"at "<<x1<<" "<<y1<<"\n";
-				} else {
-				if (x1==x2){
-					if (y1>y2) {
-						goal=std::make_tuple(5,0);
-						toNewGrid="moveD";
-					} else if (y2>y1) {
-						goal=std::make_tuple(5, 9);
-						toNewGrid="moveU";
-					} 
-				} else if (y1==y2) {
-					if (x1>x2) {
-						goal=std::make_tuple(0, 5);
-						toNewGrid="moveL";
-					} else if (x2>x1) {
-						goal=std::make_tuple(9, 5);
-						toNewGrid="moveR";
-					} 
-				
-				} else {std::cout<<"problem"<<std::endl;}
-				
-				//testing
-				int x_x;
-				int y_y;
-				tie(x_x, y_y)=goal;
-				
-				while (start!=goal) {
-				double xprecised;
-				double yprecised;
-				tie (xprecised, yprecised)=infop.robot.getLocation();
-				int x=xprecised*1.001;
-				int y=yprecised*1.001;
-				xprecised-=double(x);
-				yprecised-=double(y);
-				int xprecise=xprecised*10.001;
-				int yprecise=yprecised*10.001;
-				start= std::make_tuple(xprecise, yprecise);
-
-				if (start==goal) {
-				} else {
-				vector<Grid::Location> smallRoute=astarsearch(grid, start, goal, grids[x][y].grid);
-				smallRoute.erase(smallRoute.begin());
-				tuple<int, int> firstPos=smallRoute.front();
-				int x1_=xprecise;
+				int x1_;
 				int x2_;
-				int y1_=yprecise;
+				int y1_;
 				int y2_;
-				tie (x2_, y2_)=firstPos;
+				tie (x1_, y1_)=infop.robot.getLocation();
+				tie (x2_, y2_)=nextPos;
 				if (x1_==x2_){
 					if (y1_>y2_) {
 						str="moveD";
@@ -438,126 +293,69 @@ class Brain {
 					}
 				
 				} else {std::cout<<"problem 2"<<std::endl;}
-		
 				do {
-					if (pthread_mutex_trylock(&mutex)==0){
+					if (pthread_mutex_lock(&mutex)==0){
 					updateGrid(infop);
-					if (check) {
-						str="stop";
-						check=false;
-					}
-					pthread_mutex_unlock(&mutex);
 		
 					if (str=="moveU") {
 						move(infop, 'U');
-						check=true;
+						str="stop";
 					} else if (str=="moveR") {
 						move(infop, 'R');
-						check=true;
+						str="stop";
 					} else if (str=="moveL") {
 						move(infop, 'L');
-						check=true;
+						str="stop";
 					} else if (str=="moveD") {
 						move(infop, 'D');
-						check=true;
+						str="stop";
 					}
+					pthread_mutex_unlock(&mutex);
 					}
 					
 				} while (str!="stop"); 
-				}
-				} 
-				
-				do{
-				if (pthread_mutex_trylock(&mutex)==0){
-					updateGrid(infop);
-					if (check) {
-						toNewGrid="stop";
-						check=false;
-					}
-					pthread_mutex_unlock(&mutex);
-		
-					if (toNewGrid=="moveU") {
-						move(infop, 'U');
-						check=true;
-					} else if (toNewGrid=="moveR") {
-						move(infop, 'R');
-						std::cout<<"tonewgrid moveR"<<"\n";
-						check=true;
-					} else if (toNewGrid=="moveL") {
-						move(infop, 'L');
-						check=true;
-					}  else if (toNewGrid=="moveD") {
-						move(infop, 'D');
-						check=true;
-					}
-					}
-				} while (toNewGrid!="stop"); 
-				//reached new big grid
-				//be careful of the final direction not being in the correct direction
-				//shouldn't happen, but might
-				double xC;
-				double yC;
-				tie (xC, yC)=infop.robot.getLocation();
-				}
-	
 				nextRoute.erase(nextRoute.begin());
-			}
+				//std::cout<<"at "<<x2_<<" "<<y2_<<"\n";
+				}
+
 			getCube();
-			double xx2;
-			double yy2;
+			
+			//testing
+			/**int xx2;
+			int yy2;
 			tie (xx2, yy2)=infop.robot.getLocation();
-			std::cout<<"at "<<xx2<<" "<<yy2<<"\n";
+			//std::cout<<"at "<<xx2<<" "<<yy2<<"\n";*/
 			route.erase(route.begin());
 		}
 		
-		}
-		
-		
-};
-
-	void floodFill(int x, int y, Map &map) {
-		
-		if (x+1<10 && map.grid[x+1][y]=='\0')	{
-			map.grid[x+1][y]='W';
-			floodFill(x+1, y, map);
-		}
-		if (x-1>0 && map.grid[x-1][y]=='\0')	{
-			map.grid[x-1][y]='W';
-			floodFill(x-1, y, map);
-		}
-		if (y+1<10 && map.grid[x][y+1]=='\0')	{
-			map.grid[x][y+1]='W';
-			floodFill(x, y+1, map);
-		}
-		if (y-1>0 && map.grid[x][y-1]=='\0')	{
-			map.grid[x][y-1]='W';
-			floodFill(x, y-1, map);
-		}
 	}
-	
-	void spread(int x, int y, int grid[10][10]) {
+		
+		void spread(int x, int y) {
 		int p=1;
-		while (y+p<10 && p<3) {
-			grid[x][y+p]+=50;
+		while (y+p<100 && p<3) {
+			grids[x][y+p]+=50;
 			++p;
 		}
 		
 		p=1;
 		while (x-p>0 && p<3) {
-			grid[x-p][y]+=50;
+			grids[x-p][y]+=50;
 			++p;
 		}
 		p=1;
-		while (x+p<10 && p<3) {
-			grid[x+p][y]+=50;
+		while (x+p<100 && p<3) {
+			grids[x+p][y]+=50;
 			++p;
 		}
 		p=1;
 		while (y-p>0 && p<3) {
-			grid[x][y-p]+=50;
+			grids[x][y-p]+=50;
 			++p;
 		}
 	}
+};
+
+
 
 int main() {
 	Map map;
@@ -580,11 +378,6 @@ int main() {
    		std::cout<<"done reading"<<std::endl;
 		file.close();
 		
-		//flood fill
-		int x,y;
-		tie (x,y) = map.getStart();
-		Map map2=map;
-		floodFill(x,y,map2);
 		
 		for (int x=0; x<10; x++) {
 			for (int y=0; y<10; y++) {
@@ -593,84 +386,67 @@ int main() {
 				if (xi>0){
 					if (xi>x && yi>y) {
 						for (int p=5; p<10; p++) {
-							brain.grids[x][y].grid[p][p]+=100;
-							spread(p, p, brain.grids[x][y].grid);
+							brain.grids[x*10+p][y*10+p]+=100;
+							
 						}
 						for (int p=0; p<5; p++) {
-							brain.grids[xi][yi].grid[p][p]+=100;
-							spread(p, p, brain.grids[xi][yi].grid);
+							brain.grids[xi*10+p][yi*10+p]+=100;
 						}
 					} else if (xi>x && yi==y) {
 						for (int p=5; p<10; p++) {
-							brain.grids[x][y].grid[p][5]+=100;
-							spread(p, 5, brain.grids[x][y].grid);
+							brain.grids[x*10+p][y*10+5]+=100;
 						}
 						for (int p=0; p<5; p++) {
-							brain.grids[xi][yi].grid[p][5]+=100;
-							spread(p, 5, brain.grids[xi][yi].grid);
+							brain.grids[xi*10+p][yi*10+5]+=100;
 						}
 					} else if (xi>x && yi<y) {
 						for (int p=5; p<10; p++) {
-							brain.grids[x][y].grid[p][9-p]+=100;
-							spread(p, 9-p, brain.grids[x][y].grid);
+							brain.grids[x*10+p][y*10+9-p]+=100;
 						}
 						for (int p=0; p<5; p++) {
-							brain.grids[xi][yi].grid[p][9-p]+=100;
-							spread(p, 9-p, brain.grids[xi][yi].grid);
+							brain.grids[xi*10+p][yi*10+9-p]+=100;
 						}
 					} else if (xi<x && yi>y) {
 						for (int p=5; p<10; p++) {
-							brain.grids[x][y].grid[9-p][p]+=100;
-							spread(9-p, p, brain.grids[x][y].grid);
+							brain.grids[x*10+9-p][y*10+p]+=100;
 						}
 						for (int p=0; p<5; p++) {
-							brain.grids[xi][yi].grid[9-p][p]+=100;
-							spread(9-p, p, brain.grids[xi][yi].grid);
+							brain.grids[xi*10+9-p][yi*10+p]+=100;
 						}
 					} else if (xi<x && yi==y) {
 						for (int p=5; p<10; p++) {
-							brain.grids[x][y].grid[9-p][5]+=100;
-							spread(9-p, 5, brain.grids[x][y].grid);
+							brain.grids[x*10+9-p][y*10+5]+=100;
 						}
 						for (int p=0; p<5; p++) {
-							brain.grids[xi][yi].grid[9-p][5]+=100;
-							spread(9-p, 5, brain.grids[xi][yi].grid);
+							brain.grids[xi*10+9-p][yi*10+5]+=100;
 						}
 					} else if (xi<x && yi<y) {
 						for (int p=5; p<10; p++) {
-							brain.grids[x][y].grid[9-p][9-p]+=100;
-							spread(9-p, 9-p, brain.grids[x][y].grid);
+							brain.grids[x*10+9-p][y*10+9-p]+=100;
 						}
 						for (int p=0; p<5; p++) {
-							brain.grids[xi][yi].grid[9-p][9-p]+=100;
-							spread(9-p, 9-p, brain.grids[xi][yi].grid);
+							brain.grids[xi*10+9-p][yi*10+9-p]+=100;
 						}
 					} else if (xi==x && yi>y) {
 						for (int p=5; p<10; p++) {
-							brain.grids[x][y].grid[5][p]+=100;
-							spread(5, p, brain.grids[x][y].grid);
+							brain.grids[x*10+5][y*10+p]+=100;
 						}
 						for (int p=0; p<5; p++) {
-							brain.grids[xi][yi].grid[5][p]+=100;
-							spread(5, p, brain.grids[xi][yi].grid);
+							brain.grids[xi*10+5][yi*10+p]+=100;
 						}
 					} else if (xi==x && yi==y) {
 						for (int p=5; p<10; p++) {
-							brain.grids[x][y].grid[5][5]+=100;
-							spread(5, 5, brain.grids[x][y].grid);
+							brain.grids[x*10+5][y*10+5]+=100;
 						}
 						for (int p=0; p<5; p++) {
-							brain.grids[xi][yi].grid[5][5]+=100;
-							spread(5, 5, brain.grids[xi][yi].grid);
+							brain.grids[xi*10+5][yi*10+5]+=100;
 						}
 					} else if (xi==x && yi<y) {
 						for (int p=5; p<10; p++) {
-							brain.grids[x][y].grid[5][9-p]+=100;
-							spread(5, 9-p, brain.grids[x][y].grid);
+							brain.grids[x*10+5][y*10+9-p]+=100;
 						}
 						for (int p=0; p<5; p++) {
-							brain.grids[xi][yi].grid[5][9-p]+=100;
-							spread(5, 9-p, brain.grids[xi][yi].grid);
+							brain.grids[xi*10+5][yi*10+9-p]+=100;
 						}
 					} 
 			}}
@@ -678,37 +454,26 @@ int main() {
 		}
 		
 		//for testing
-		for (int x=0; x<10; x++) {
-			for (int p=0; p<10; p++) {
-				std::cout<<"\n";
-				for (int y=0;y<10;y++) {
-					for (int q=0; q<10; q++) {
-						if (brain.grids[y][x].grid[q][p]>=100) {
+		for (int x=0; x<100; x++) {
+		std::cout<<"\n";
+			for (int y=0; y<100; y++) {
+						if (brain.grids[y][x]==100) {
 							std::cout<<".";
 						} else std::cout<<" ";
 					}
 					
-				}
-			
-			}
 		
 		}
 		
 		//run A*
-		Grid::Location locs[10][10];
-		Grid::Location start= map.getStart();
-		int pm[10][10]={{0}};
+		Grid::Location locs[100][100];
+		int x, y;
+		tie (x,y) = map.getStart();
+		Grid::Location start= std::make_tuple((x*10-5), (y*10-5));
 
-		for (int m=0; m<10; m++) {
-	  	for (int n=0; n<10; n++) {
+		for (int m=0; m<100; m++) {
+	  	for (int n=0; n<100; n++) {
 	    	locs[m][n] = make_tuple(m,n);
-	    	if (map2.lookForObstacles(m,n)!='\0') {
-	    		pm[m][n] = 0;
-	    	} else {pm[m][n]=100;}
-
-	    	if (map.lookForObstacles(m,n)!='\0') {
-	    		pm[m][n] = 10;
-	    	} 
 		}	
 		}
 		Grid grid (locs);
@@ -720,15 +485,14 @@ int main() {
 	   		int y;
 	   		tie(x,y)=start;
 	   		std::cout<< "start x= "<<x<<"\ty= "<<y<<"\n";
-	    		Grid::Location goal= std::make_tuple(m,n);
-	    		std::cout<< "goal x= "<<m<<"\ty= "<<n<<"\n";
-				brain.route.push_back(astarsearch(grid, start, goal, pm));
+	    		Grid::Location goal= std::make_tuple(m*10-5,n*10-5);
+	    		std::cout<< "goal x= "<<(m*10-5)<<"\ty= "<<(n*10-5)<<"\n";
+				brain.route.push_back(astarsearch(grid, start, goal, brain.grids));
 				start=goal;
 	    	} 
 	    	
 	 		}
 		}	
-		
 		for (auto &nextRoute: brain.route) {
 		for (auto &pos:nextRoute) {
 			int x;
@@ -736,10 +500,9 @@ int main() {
 			tie (x,y) = pos;
 			std::cout<<"x= "<<x<<" y= "<<y<<"\n";
 		}
+		std::cout<<"\n\n";
 		}
-		
-		
-	
+
 	//make thread 
 	Robot robot(map);
 	struct info infos(robot);
@@ -756,7 +519,7 @@ int main() {
 		return 1;
 		
 	}
-	
+
 	brain.path(infos);
 	brain.stop(infos);
 	
