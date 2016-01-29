@@ -33,7 +33,7 @@ using std::size_t;
 using std::string;
 
 struct Grid {
-  static const int currentBounds = 10;
+  static const int currentBounds = 100;
   typedef tuple<int,int> Location;
   Location (&allLocations)[currentBounds][currentBounds]; 
   
@@ -103,7 +103,6 @@ struct PriorityQueue {
   }
 };
 
-
-vector<Grid::Location> astarsearch(Grid grid, Grid::Location start, Grid::Location goal, int probabilityMap[10][10]);
+vector<Grid::Location> astarsearch(Grid grid, Grid::Location start, Grid::Location goal, int probabilityMap[100][100]);
   
 #endif
