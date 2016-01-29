@@ -11,9 +11,10 @@
 Servo leftServo, rightServo;
 
 IntervalTimer goodbye;
-static int life = 178 * 1000 * 1000;
+static int gameTime = 175 * 1000 * 1000;
 
 extern void halt();
+extern bool endGame();
 
 static void dit() {
 #ifndef NDEBUG
@@ -93,7 +94,7 @@ void setup() {
   stepperOperation(LEFT, UP, STEPPER_STEP_1 + STEPPER_STEP_2);
   stepperOperation(RIGHT, UP, STEPPER_STEP_1 + STEPPER_STEP_2);
 
-  goodbye.begin(halt, life);
+  goodbye.begin((void(*)())endGame, gameTime);
 
   //debugPrint("Module Init OK\n");
 }
