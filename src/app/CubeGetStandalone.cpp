@@ -11,9 +11,9 @@ int main()
     //cam.moveTowardsStack();
     cam.moveTowardsCube();
     if((cam.cubeFound == 3)||(cam.cubeNotFound >= 1000)  //If stack is found
-      {
-	exit();
-      }
-      }
+    {
+        exit();
+    }
+  }
   return 0;
 }
