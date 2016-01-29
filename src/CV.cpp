@@ -369,7 +369,7 @@ void Camera::moveTowardsCube() {
     #ifdef SHOW_COUT
             cout << cubeNotFound << endl;
     #endif
-            if(cubeNotFound % 5)
+            if((cubeNotFound % 5) == 1)
             {
                 ///If no cube present (accounting for noise)
                 if(cubeNotFound >= 200)
@@ -382,7 +382,6 @@ void Camera::moveTowardsCube() {
                 }
             }
         }
-        break;
     }
     else
     {
@@ -465,18 +464,18 @@ void Camera::moveTowardsCube() {
 #ifdef SHOW_COUT
             cout << cubeNotFound << endl;
 #endif
-	    if(cubeNotFound % 5)
-	      {
-            ///If no cube present (accounting for noise)
-            if(cubeNotFound >= 200)
-            {
-                turn(1);
-            }
-            else if(cubeNotFound > 20)
-            {
-                turn(-1); //Turn
-            }
-	      }
+            if((cubeNotFound % 5) == 1)
+              {
+                ///If no cube present (accounting for noise)
+                if(cubeNotFound >= 200)
+                {
+                    turn(1);
+                }
+                else if(cubeNotFound > 20)
+                {
+                    turn(-1); //Turn
+                }
+              }
         }
 	}
 }
