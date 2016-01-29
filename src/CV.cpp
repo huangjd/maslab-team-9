@@ -281,9 +281,9 @@ void Camera::moveTowardsCube() {
 	ColorThresholding(image, 130, src_bin_r, src_bin_g);
 	CubeContours(image, src_bin_r, src_bin_g, imageDrawn, blockCenter_r, blockCenter_g);
 
-#ifndef NDEBUG
+//#ifndef NDEBUG
       	imshow("Camera Feed", imageDrawn);   //Display camera
-#endif
+//#endif
 
 	///Actions to do if cube is found
         //Red cube has priority; first detected cube will be picked up
@@ -388,7 +388,7 @@ void Camera::moveTowardsStack() {
             ///Fix the decimal values
             if((block.x > (resX - 0.1*resX))&&(block.y > 0.4*resY)&&(block.y < 0.6*resY)) //If cube is in corner
             {
-	      move_forward(1);
+                charge();
                 stackFound = 1;
             }
             else if(block.y < 0.4*resY) //If cube is too far right
