@@ -14,17 +14,9 @@ int main() {
     getline(cin, mode);
     cout << "Input Duration: " << endl;
     cin >> duration;
-    switch(mode)
-    {
-    case "F":
+    if(mode == "F")
         move_forward(duration);
-        break;
-    case "T":
+    else if(mode == "T")
         turn(duration);
-        break;
-    default:
-        break;
-    }
-
   }
 }
