@@ -264,7 +264,7 @@ Camera::Camera() : resX(320), resY(240), cap(0), thresCanny(130), cubeNotFound(0
   }
   cap.set(CV_CAP_PROP_FRAME_WIDTH,resX);
   cap.set(CV_CAP_PROP_FRAME_HEIGHT,resY);
-  cap.set(CV_CAP_PROP_BUFFERSIZE, 3);
+  //cap.set(CV_CAP_PROP_BUFFERSIZE, 3);
 }
 
 Camera::~Camera() {
