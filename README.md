@@ -27,10 +27,9 @@ To build the source code, type the following commands in the project directory:
   make
   
 
-
-![Front view](https://cloud.githubusercontent.com/assets/4660595/22714416/6220cf28-ed5a-11e6-8957-8a8b797beca6.PNG "Front view of the mechanical assembly" =200x200)
-
-![Side view](https://cloud.githubusercontent.com/assets/4660595/22714415/6220b4c0-ed5a-11e6-8230-7574ae27a7da.PNG "Side view of the mechanical assembly" =200x200)
-
 <img src="https://cloud.githubusercontent.com/assets/4660595/22714417/6224cdda-ed5a-11e6-87d0-933745653ffd.PNG" width="200" title="3d view of the mechanical assembly" >
+
+<img src="https://cloud.githubusercontent.com/assets/4660595/22714416/6220cf28-ed5a-11e6-8957-8a8b797beca6.PNG" width="200" title="Front view of the mechanical assembly" >
+
+<img src="https://cloud.githubusercontent.com/assets/4660595/22714415/6220b4c0-ed5a-11e6-8230-7574ae27a7da.PNG" width="200" title="Side view of the mechanical assembly" >
 
